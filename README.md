@@ -1,8 +1,28 @@
-# Comparativo de Algoritmos 
+# Comparativo de Algoritmos de Inteligência Artificial
 
-## Aplicação no problema das Sequências de Genes de Junção de Emenda
+## Aplicação no problema das Junções de emenda (uniões) das Sequências de Genes (DNA) de Primatas
 
-## Descrição do Problema
+Junções de emenda (uniões) são pontos em uma sequência de DNA nos quais o DNA **supérfluo** é removido durante o processo de criação de proteínas em organismos superiores. O problema proposto neste conjunto de dados é **reconhecer, dada uma sequência de DNA, os limites entre exons (as partes da sequência de DNA retidas após o emendamento, ou junção) e íntrons (as partes da sequência de DNA que são emendadas)**. Este problema consiste em duas subtarefas: reconhecer limites de exon/íntron (chamados de sítios EI) e reconhecer limites de íntron/éxon (sítios IE). (Na comunidade biológica, os limites de IE são chamados de **acceptors**, enquanto os limites de EI são chamados de **donors**.)
+
+Este conjunto de dados **(que vamos utilizar nessas availiações)** foi desenvolvido para ajudar a avaliar um algoritmo de aprendizado "híbrido" (KBANN) que usa exemplos para refinar indutivamente o conhecimento preexistente. Usando uma metodologia de "validação cruzada" de dez vezes em 1000 exemplos selecionados aleatoriamente do conjunto completo de 3190, as seguintes taxas de erro foram produzidas por vários algoritmos de ML - Machine Learning (todos os experimentos foram realizados na Universidade de Wisconsin, às vezes com implementações locais de algoritmos publicados).
+
+| System |Neither|  EI | IE  |
+|:-----:|------:|-----:|-----:|
+|KBANN  |  4.62 |  7.56|  8.47|
+|BACKPROP| 5.29 |  5.74| 10.75|
+|PEBLS | 6.86| 8.18| 7.55|
+|PERCEPTRON| 3.99| 16.32| 17.41|
+|ID3 |  8.84| 10.58| 13.99|
+|COBWEB| 11.80| 15.04| 9.46|
+|Near. Neighbor| 31.11| 11.65| 9.09|
+
+
+>[!Important]
+>Dos algoritmos acima, somente iremos utilizar nas comparações o **KBANN (Knowledge-Based Artificial Neural Networks)**, demais algoritmos da comparação estarão descritos na sequência deste documento.
+
+Fonte: https://archive.ics.uci.edu/dataset/69/molecular+biology+splice+junction+gene+sequences, último acesso em 01/01/2025
+
+## Descrição da Teoria Adjacente
 
 A ***Teoria de Domínio Sequencial***, também conhecida como ***Teoria da Domínio do Gene***, é um conceito na biologia molecular e genética que se refere a como as proteínas e outros produtos gênicos são organizados e expressos de maneira funcional em organismos. Essa teoria é particularmente relevante para a compreensão das sequências de aminoácidos que constituem as proteínas e a maneira como essas sequências se relacionam com a função biológica.
 
@@ -59,11 +79,11 @@ A Teoria de Domínio Sequencial é fundamental para a biologia e genética moder
 
 ## Desenvolvimento do Trabalho
 
-Comparativo de algoritmos aplicados no problema da $${\color{blue}Sequências \space de \space Genes \space de \space Junção de Emenda}$$ é um exercício teórico relevante para nossa compreensão do funcionamento dos algoritmos e dos resultados que emergem de sua aplicação no problema descrito no contexto.
+Comparativo de algoritmos aplicados no problema das ***Junções de emenda (uniões) das Sequências de Genes (DNA) de Primatas*** é um exercício teórico relevante para nossa compreensão do funcionamento dos algoritmos e dos resultados que emergem de sua aplicação no problema descrito no contexto.
 
 Os objetivos principais neste trabalho é apresentar perspectivas de aplicação de ***diferentes*** algoritmos de Inteligência Artificial, no problema acima descrito e caracterizado como um problema a de **classificação**. Deste modo elencamos os seguintes algoritmos para tentar resolver o problema de classificação das sequências de DNA:
   
-  - **Rede Neural KBNN (Knowledge-Based Artificial Neural Networks)**
+  - [Rede Neural KBANN (Knowledge-Based Artificial Neural Networks)](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.inf.ufrgs.br/~engel/data/media/file/cmp121/kbann-artigo.pdf&ved=2ahUKEwiFn9yCqdWKAxX4BrkGHWFMEq8QFnoECBUQAQ&usg=AOvVaw2yzjp752bnqkN2fu16XcdW)
   - **RandomForestClassifier**
   - **SVM Classifier**
   - **MLP Classifier - Multi Layer Perceptron - Rede Neural Multi Camadas - Perceptron**
