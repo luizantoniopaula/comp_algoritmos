@@ -8,6 +8,9 @@ A ***Teoria de Domínio Sequencial***, também conhecida como ***Teoria da Domí
 
 A teoria postula que proteinas são compostas de várias sequências ou ***domínios funcionais***, que podem ser consideradas como "blocos de construção" dos quais as proteínas são montadas. Cada domínio pode ter uma função específica e, muitas vezes, pode ser encontrado em diversas proteínas em diferentes contextos. 
 
+Os domínios são regiões da sequência polipeptídica que apresentam aspectos estruturais e funcionais característicos, muitas vezes funcionando independentemente de outras partes da proteína. Essas regiões também podem se combinar de diferentes formas para executar diferentes tarefas.
+
+Pode-se dizer que a proteína é um componente modular, que pode ser agrupado e classificado de acordo com os domínios que possui. Muitos desses domínios não apenas formam estruturas estáveis dobradas em solução, mas frequentemente retêm parte da função bioquímica da proteína maior da qual são derivados. 
 
 ## Importância dos Domínios Sequenciais
 
@@ -45,6 +48,7 @@ O gene da **β-globina** em humanos é um caso famoso que ilustra a teoria de do
 
   - O site do NCBI oferece acesso a uma variedade de artigos de pesquisa e revisões sobre domínios sequenciais. (https://www.ncbi.nlm.nih.gov)
   - UniProt: Um recurso extensivo para informações de proteínas que inclui dados sobre domínios funcionais (https://www.uniprot.org/).
+  - Domínio proteico: Wikepedia, acesso em 30/12/2024 (https://pt.wikipedia.org/wiki/Dom%C3%ADnio_proteico)
         
 
 **Conclusão sobre a Teoria de Domínio Sequencial**
