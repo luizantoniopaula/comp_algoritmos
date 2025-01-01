@@ -6,9 +6,6 @@
 
 A ***Teoria de Domínio Sequencial***, também conhecida como ***Teoria da Domínio do Gene***, é um conceito na biologia molecular e genética que se refere a como as proteínas e outros produtos gênicos são organizados e expressos de maneira funcional em organismos. Essa teoria é particularmente relevante para a compreensão das sequências de aminoácidos que constituem as proteínas e a maneira como essas sequências se relacionam com a função biológica.
 
-
-## Conceitos Básicos
-
 A teoria postula que proteinas são compostas de várias sequências ou ***domínios funcionais***, que podem ser consideradas como "blocos de construção" dos quais as proteínas são montadas. Cada domínio pode ter uma função específica e, muitas vezes, pode ser encontrado em diversas proteínas em diferentes contextos. 
 
 
