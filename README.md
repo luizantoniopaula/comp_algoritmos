@@ -84,7 +84,7 @@ Comparativo de algoritmos aplicados no problema das ***Junções de emenda (uni�
 Os objetivos principais neste trabalho é apresentar perspectivas de aplicação de ***diferentes*** algoritmos de Inteligência Artificial, no problema acima descrito e caracterizado como um problema a de **classificação**. Deste modo elencamos os seguintes algoritmos para tentar resolver o problema de classificação das sequências de DNA:
   
   - [Rede Neural KBANN (Knowledge-Based Artificial Neural Networks)](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.inf.ufrgs.br/~engel/data/media/file/cmp121/kbann-artigo.pdf&ved=2ahUKEwiFn9yCqdWKAxX4BrkGHWFMEq8QFnoECBUQAQ&usg=AOvVaw2yzjp752bnqkN2fu16XcdW)
-  - **RandomForestClassifier**
+  - [RandomForestClassifier](https://link.springer.com/article/10.1023/a:1010933404324)
   - **SVM Classifier**
   - **MLP Classifier - Multi Layer Perceptron - Rede Neural Multi Camadas - Perceptron**
 
