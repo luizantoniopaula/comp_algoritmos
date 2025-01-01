@@ -75,6 +75,6 @@ Os ajustes dos hiperparâmetros foram realizados e discutidos nos códigos em Py
 
 ## Sobre o Trabalho
 
-O presente trabalho foi desenvolvido como exercício final para a disciplina de **CA006NC - Inteligência Artificial**, do curso de Mestrado em Inteligência Artificial, dentro do PPGI - Programa De Pós-Graduação em Informática.
+O presente trabalho foi desenvolvido como exercício final para a disciplina de **CA006NC - Inteligência Artificial**, do curso de Mestrado em Inteligência Artificial, dentro do PPGI - Programa de Pós-Graduação em Informática, da UTFPR Cornélio Procópio/PR
 
 Elaboração: **Luiz Antonio Silva de Paula**
