@@ -5,6 +5,7 @@
 import locale
 import numpy as np
 import pandas as pd
+import ucimlrepo
 from ucimlrepo import fetch_ucirepo
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split
@@ -27,12 +28,12 @@ y = molecular_biology_splice_junction_gene_sequences.data.targets
 
 
 # Verificando dados
-print(molecular_biology_splice_junction_gene_sequences.metadata)
-print(molecular_biology_splice_junction_gene_sequences.variables)
+print(molecular_biology_splice_junction_gene_sequences.metadata)  # metadados
+print(molecular_biology_splice_junction_gene_sequences.variables) # dados variáveis
 
 # Codificação One-hot para sequências de DNA
 def encode_sequences(X):
-    # Flatten the sequences into a single array
+    # Achatar (flatten) as sequências em um array simples
     sequences = np.array(X)
     flat_sequences = sequences.reshape(-1)
 
@@ -47,12 +48,10 @@ X_encoded = encode_sequences(X)
 
 # Codificação das classes
 label_encoder = LabelEncoder()
-# y_encoded = label_encoder.fit_transform(y)
-# y_encoded = label_encoder.fit_transform(y.ravel())
 y_encoded = label_encoder.fit_transform(
     y.to_numpy().ravel())  # Problemas na função ravel() do numpy vindo de dataframe Pandas
 
-# Divisão em treino e teste
+# Divisão em treino e teste (20% para teste e 80% para treinamento)
 X_train, X_test, y_train, y_test = train_test_split(X_encoded, y_encoded, test_size=0.2, random_state=42)
 
 #Treinamento com RandomForest
@@ -93,7 +92,7 @@ print("Accuracy:", accuracy_score(y_test, mlp_y_pred))
 
 
 #
-# Treinamento e análise com uma rede KBNN (Knowledge-Based Artificial Neural Network),
+# Treinamento e análise com uma rede KBANN (Knowledge-Based Artificial Neural Network),
 # ou Rede Neural Artificial Baseada em Conhecimento
 
 # Definindo o modelo KBANN simples usando Keras
