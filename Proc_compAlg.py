@@ -16,7 +16,6 @@ from sklearn.neural_network import MLPClassifier
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Input
 
-
 # Define padrões de Data e Hora para o Brasil
 locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
 
@@ -26,10 +25,10 @@ molecular_biology_splice_junction_gene_sequences = fetch_ucirepo(id=69)
 X = molecular_biology_splice_junction_gene_sequences.data.features
 y = molecular_biology_splice_junction_gene_sequences.data.targets
 
-
 # Verificando dados
 print(molecular_biology_splice_junction_gene_sequences.metadata)  # metadados
-print(molecular_biology_splice_junction_gene_sequences.variables) # dados variáveis
+print(molecular_biology_splice_junction_gene_sequences.variables)  # dados variáveis
+
 
 # Codificação One-hot para sequências de DNA
 def encode_sequences(X):
@@ -54,49 +53,66 @@ y_encoded = label_encoder.fit_transform(
 # Divisão em treino e teste (20% para teste e 80% para treinamento)
 X_train, X_test, y_train, y_test = train_test_split(X_encoded, y_encoded, test_size=0.2, random_state=42)
 
-#Treinamento com RandomForest
 
-rf_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
-rf_classifier.fit(X_train, y_train)
-rf_y_pred = rf_classifier.predict(X_test)
+# Treinamento com RandomForest
+def random_forest():
 
-# Avaliação
-print("Random Forest Results:")
-print(confusion_matrix(y_test, rf_y_pred))
-print(classification_report(y_test, rf_y_pred))
-print("Accuracy:", accuracy_score(y_test, rf_y_pred))
+    # Hiperparâmetros: n_estimators=100 -> árvores de decisão a serem utilizadas e,
+    # random_state=42 -> Valor da semente de aleatoriedade do estimador (ideal manter constante)
+    rf_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
+    rf_classifier.fit(X_train, y_train)
+    rf_y_pred = rf_classifier.predict(X_test)
+
+    # Avaliação
+    print("Random Forest Results:")
+    print(confusion_matrix(y_test, rf_y_pred))
+    print(classification_report(y_test, rf_y_pred))
+    print("Accuracy:", accuracy_score(y_test, rf_y_pred))
+
 
 #
-# Treinamento em SVM
-svm_classifier = SVC(kernel='linear', random_state=42)
-svm_classifier.fit(X_train, y_train)
-svm_y_pred = svm_classifier.predict(X_test)
+# Treinamento em SVM - Support Vector Machine
+def svm_exec():
 
-# Avaliação
-print("\nSVM Results:")
-print(confusion_matrix(y_test, svm_y_pred))
-print(classification_report(y_test, svm_y_pred))
-print("Accuracy:", accuracy_score(y_test, svm_y_pred))
+    # Hiperparâmetros: kernel=linear, para classes que podem ser separadas linearmente
+    # random_state=42 -> Valor da semente de aleatoriedade do estimador (ideal manter constante)
+    svm_classifier = SVC(kernel='linear', random_state=42)
+    svm_classifier.fit(X_train, y_train)
+    svm_y_pred = svm_classifier.predict(X_test)
+
+    # Avaliação
+    print("\nSVM Results:")
+    print(confusion_matrix(y_test, svm_y_pred))
+    print(classification_report(y_test, svm_y_pred))
+    print("Accuracy:", accuracy_score(y_test, svm_y_pred))
+
 
 #
 # Treinamento em Rede Neural MLP
-mlp_classifier = MLPClassifier(hidden_layer_sizes=(100,), max_iter=300, random_state=42)
-mlp_classifier.fit(X_train, y_train)
-mlp_y_pred = mlp_classifier.predict(X_test)
+def mlp_exec():
 
-# Avaliação
-print("\nResultados pela Rede Neural MLPClassifier:")
-print(confusion_matrix(y_test, mlp_y_pred))
-print(classification_report(y_test, mlp_y_pred))
-print("Accuracy:", accuracy_score(y_test, mlp_y_pred))
+    # Hiperparâmetros:
+    #  hidden_layer_sizes=(100,) usando 100 neurônios (perceptrons) na camada oculta única
+    #  max_iter=300 = máximo de iterações (épocas) para o algoritmo de otimização durante o treinamento.
+    mlp_classifier = MLPClassifier(hidden_layer_sizes=(100,), max_iter=300, random_state=42)
+    mlp_classifier.fit(X_train, y_train)
+    mlp_y_pred = mlp_classifier.predict(X_test)
+
+    # Avaliação
+    print("\nResultados pela Rede Neural MLPClassifier:")
+    print(confusion_matrix(y_test, mlp_y_pred))
+    print(classification_report(y_test, mlp_y_pred))
+    print("Accuracy:", accuracy_score(y_test, mlp_y_pred))
 
 
 #
 # Treinamento e análise com uma rede KBANN (Knowledge-Based Artificial Neural Network),
 # ou Rede Neural Artificial Baseada em Conhecimento
+# Definindo/criando o modelo KBANN simples usando Keras
+def kbann_model(input_dim):
 
-# Definindo o modelo KBANN simples usando Keras
-def create_kbann_model(input_dim):
+    # Hiperparâmetros:
+    #
     model = Sequential()
     model.add(Input(shape=(input_dim,)))  # Camada de entrada usando Input
     model.add(Dense(128, activation='relu'))  # Camada oculta
@@ -105,21 +121,25 @@ def create_kbann_model(input_dim):
     model.add(Dropout(0.5))  # Dropout
     model.add(Dense(32, activation='relu'))  # Outra camada oculta
     model.add(Dense(len(np.unique(y_encoded)), activation='softmax'))  # Camada de saída
-
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
     return model
 
 
-# Criar e treinar o modelo
-kbann_model = create_kbann_model(X_train.shape[1])
-kbann_model.fit(X_train, y_train, epochs=50, batch_size=64, verbose=1)
-kbann_model.summary()
+# Executar o treinamento e aprendizado do modelo
+def kbann_exe():
 
-# Avaliação
-kbann_y_pred = np.argmax(kbann_model.predict(X_test), axis=-1)
+    # Hiperparâmetros:
+    #
+    kbann_model = create_kbann_model(X_train.shape[1])
+    kbann_model.fit(X_train, y_train, epochs=50, batch_size=64, verbose=1)
+    kbann_model.summary()
 
-# Resultados
-print("\nResultados do KBANN:")
-print(confusion_matrix(y_test, kbann_y_pred))
-print(classification_report(y_test, kbann_y_pred))
-print("Accuracy:", accuracy_score(y_test, kbann_y_pred))
+    # Avaliação
+    kbann_y_pred = np.argmax(kbann_model.predict(X_test), axis=-1)
+
+    # Resultados
+    print("\nResultados do KBANN:")
+    print(confusion_matrix(y_test, kbann_y_pred))
+    print(classification_report(y_test, kbann_y_pred))
+    print("Accuracy:", accuracy_score(y_test, kbann_y_pred))
