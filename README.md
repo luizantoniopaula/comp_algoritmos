@@ -22,7 +22,7 @@ Este conjunto de dados **(que vamos utilizar nessas availiações)** foi desenvo
 
 Fonte: https://archive.ics.uci.edu/dataset/69/molecular+biology+splice+junction+gene+sequences, último acesso em 01/01/2025
 
-## Descrição da Teoria Adjacente
+### Descrição da Teoria Subjacente
 
 A ***Teoria de Domínio Sequencial***, também conhecida como ***Teoria da Domínio do Gene***, é um conceito na biologia molecular e genética que se refere a como as proteínas e outros produtos gênicos são organizados e expressos de maneira funcional em organismos. Essa teoria é particularmente relevante para a compreensão das sequências de aminoácidos que constituem as proteínas e a maneira como essas sequências se relacionam com a função biológica.
 
@@ -32,7 +32,7 @@ Os domínios são regiões da sequência polipeptídica que apresentam aspectos 
 
 Pode-se dizer que a proteína é um componente modular, que pode ser agrupado e classificado de acordo com os domínios que possui. Muitos desses domínios não apenas formam estruturas estáveis dobradas em solução, mas frequentemente retêm parte da função bioquímica da proteína maior da qual são derivados. 
 
-## Importância dos Domínios Sequenciais
+### Importância dos Domínios Sequenciais
 
 **Função Proteica**: Os domínios proteicos são responsáveis por diferentes funções biológicas. Por exemplo, um domínio pode ser responsável pela ligação ao DNA, enquanto outro pode participar de interações com outras proteínas.
 
@@ -81,12 +81,12 @@ A Teoria de Domínio Sequencial é fundamental para a biologia e genética moder
 
 Comparativo de algoritmos aplicados no problema das ***Junções de emenda (uniões) das Sequências de Genes (DNA) de Primatas*** é um exercício teórico relevante para nossa compreensão do funcionamento dos algoritmos e dos resultados que emergem de sua aplicação no problema descrito no contexto.
 
-Os objetivos principais neste trabalho é apresentar perspectivas de aplicação de ***diferentes*** algoritmos de Inteligência Artificial, no problema acima descrito e caracterizado como um problema a de **classificação**. Deste modo elencamos os seguintes algoritmos para tentar resolver o problema de classificação das sequências de DNA:
+Os objetivos principais neste trabalho é apresentar perspectivas de aplicação de ***diferentes*** algoritmos de Inteligência Artificial, no problema acima descrito, o qual caracterizado como um problema de **classificação**. Mas não somente a utilização dos algoritmos, como também a escolha e justificativas dos Hiperparâmetros escolhidos, os quais sabidamente afetam os resultados obtidos, e que podem inviabilizar as comparações entre eles. Deste modo elencamos os seguintes algoritmos para tentar resolver o problema de classificação das sequências de DNA:
   
   - [Rede Neural KBANN (Knowledge-Based Artificial Neural Networks)](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.inf.ufrgs.br/~engel/data/media/file/cmp121/kbann-artigo.pdf&ved=2ahUKEwiFn9yCqdWKAxX4BrkGHWFMEq8QFnoECBUQAQ&usg=AOvVaw2yzjp752bnqkN2fu16XcdW)
   - [RandomForestClassifier](https://link.springer.com/article/10.1023/a:1010933404324)
-  - **SVM Classifier**
-  - **MLP Classifier - Multi Layer Perceptron - Rede Neural Multi Camadas - Perceptron**
+  - [SVM Classifier](https://link.springer.com/article/10.1007/BF00994018)
+  - [MLP Classifier - Multi Layer Perceptron](https://www.semanticscholar.org/paper/Learning-representations-by-back-propagating-errors-Rumelhart-Hinton/052b1d8ce63b07fec3de9dbb583772d860b7c769)
 
 Os ajustes dos hiperparâmetros foram realizados e discutidos nos códigos em Python, dentro das funções que executam cada algoritmo individual, e seus resultados foram apresentados de forma gráfica e também discutidos e apresentados no item Resultados abaixo.
 
