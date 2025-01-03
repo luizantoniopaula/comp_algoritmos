@@ -2,7 +2,9 @@
 #
 # Análise de sequências de nucleotídeos ATGC de DNA
 #
+import os
 import locale
+import warnings
 import numpy as np
 import pandas as pd
 import ucimlrepo
@@ -13,11 +15,27 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
+import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Input
+from sklearn.model_selection import KFold
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.callbacks import EarlyStopping
 
 # Define padrões de Data e Hora para o Brasil
 locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
+# Suprimir todos os warnings
+warnings.filterwarnings('ignore')
+# Definições de nível de Log
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # 1: INFO, 2: WARNING, 3: ERROR
+tf.get_logger().setLevel('ERROR')  # Configura apenas erros a serem exibidos
+
+# Definindo a semente para numpy
+np.random.seed(42)
+
+# Definindo a semente para TensorFlow
+tf.random.set_seed(42)
 
 #
 # Carregar o conjunto de dados
@@ -25,9 +43,12 @@ molecular_biology_splice_junction_gene_sequences = fetch_ucirepo(id=69)
 X = molecular_biology_splice_junction_gene_sequences.data.features
 y = molecular_biology_splice_junction_gene_sequences.data.targets
 
-# Verificando dados
-print(molecular_biology_splice_junction_gene_sequences.metadata)  # metadados
-print(molecular_biology_splice_junction_gene_sequences.variables)  # dados variáveis
+# Garanta que X e y são arrays NumPy
+if isinstance(X, pd.DataFrame):
+    X = X.values  # Converte para array NumPy se necessário
+
+if isinstance(y, (pd.DataFrame, pd.Series)):
+    y = y.values  # Converte para array NumPy se necessário
 
 
 # Codificação One-hot para sequências de DNA
@@ -39,7 +60,6 @@ def encode_sequences(X):
     # One-hot encode the characters
     encoder = OneHotEncoder(categories='auto')
     one_hot_encoded = encoder.fit_transform(flat_sequences[:, None]).toarray()
-
     return one_hot_encoded.reshape(sequences.shape[0], -1)
 
 
@@ -47,16 +67,19 @@ X_encoded = encode_sequences(X)
 
 # Codificação das classes
 label_encoder = LabelEncoder()
-y_encoded = label_encoder.fit_transform(
-    y.to_numpy().ravel())  # Problemas na função ravel() do numpy vindo de dataframe Pandas
+y_encoded = label_encoder.fit_transform(y) # .to_numpy().ravel()) # Problemas na função ravel() do numpy vindo de dataframe Pandas
 
 # Divisão em treino e teste (20% para teste e 80% para treinamento)
 X_train, X_test, y_train, y_test = train_test_split(X_encoded, y_encoded, test_size=0.2, random_state=42)
 
+# Mostrando índices dos rótulos e valores
+print("Índices dos rótulos:", y_encoded)
+# print("Tipo de dado dos rótulos: ", type(y))
+print("Rótulos originais:", np.unique(y))  # y são os rótulos originais
+
 
 # Treinamento com RandomForest
 def random_forest():
-
     # Hiperparâmetros: n_estimators=100 -> árvores de decisão a serem utilizadas e,
     # random_state=42 -> Valor da semente de aleatoriedade do estimador (ideal manter constante)
     rf_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
@@ -73,7 +96,6 @@ def random_forest():
 #
 # Treinamento em SVM - Support Vector Machine
 def svm_exec():
-
     # Hiperparâmetros: kernel=linear, para classes que podem ser separadas linearmente
     # random_state=42 -> Valor da semente de aleatoriedade do estimador (ideal manter constante)
     svm_classifier = SVC(kernel='linear', random_state=42)
@@ -90,7 +112,6 @@ def svm_exec():
 #
 # Treinamento em Rede Neural MLP
 def mlp_exec():
-
     # Hiperparâmetros:
     #  hidden_layer_sizes=(100,) usando 100 neurônios (perceptrons) na camada oculta única
     #  max_iter=300 = máximo de iterações (épocas) para o algoritmo de otimização durante o treinamento.
@@ -109,37 +130,137 @@ def mlp_exec():
 # Treinamento e análise com uma rede KBANN (Knowledge-Based Artificial Neural Network),
 # ou Rede Neural Artificial Baseada em Conhecimento
 # Definindo/criando o modelo KBANN simples usando Keras
-def kbann_model(input_dim):
-
+def modelo_kbann(input_dim):
     # Hiperparâmetros:
-    #
+    #  add(Dense(128, activation='relu') -> Define 128 neurônios totalmente conectados, usando a função de ativação 'relu'
+    #  Rectified Linear Unit (unidade linear retificada) - Camadas Dense, são hidden layers, camadas internas da rede neural.
+    #  add(Dropout(0.5) -> Camada de dropout, que desativa aleatoriamente 50% dos neurônios durante o treinamento.
+    #  add(Dense(64, activation='relu') -> Cria mais uma camada densa, com 64 neurônios e função de ativação ReLU.
+    #  add(Dense(32, activation='relu') -> Cria mais uma camada densa, com 32 neurônios e função de ativação ReLU.
+    #  add(Dense(len(np.unique(y_encoded)), activation='softmax') -> Camada de saída com número de neurônios igual
+    #  ao número de classes únicas no conjunto de dados de saída (y_encoded).
+    #  activation='softmax' -> A função de ativação softmax, que transforma as saídas em probabilidades que somam a 1,
+    #  importante para tarefas de classificação multi-classe, como no problema em análise.
+    #  loss='sparse_categorical_crossentropy' -> Função de perda (sparse_categorical_crossentropy) usada para problemas de
+    #  classificação com classes de valores inteiros. Para saídas não codificadas one-hot.
+    #  optimizer='adam' -> Adam é um algoritmo de otimização eficiente que ajusta as taxas de aprendizado durante o treinamento.
+    #  metrics=['accuracy'] -> métrica a ser monitorada durante o treinamento e a avaliação, neste caso, a acurácia do modelo.
     model = Sequential()
     model.add(Input(shape=(input_dim,)))  # Camada de entrada usando Input
-    model.add(Dense(128, activation='relu'))  # Camada oculta
-    model.add(Dropout(0.5))  # Dropout para reduzir overfitting, é uma das técnicas de regularização para combater o overfitting.
-    model.add(Dense(64, activation='relu'))  # Outra camada oculta
+    #model.add(Dense(256, activation='relu', kernel_regularizer=l2(0.01)))  # Camada oculta
+    #model.add(Dropout(0.5))  # Dropout para reduzir overfitting, é uma das técnicas de regularização para combater o overfitting.
+    #model.add(Dense(128, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
+    #model.add(Dropout(0.5))  # Dropout
+    model.add(Dense(64, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
     model.add(Dropout(0.5))  # Dropout
-    model.add(Dense(32, activation='relu'))  # Outra camada oculta
+    model.add(Dense(32, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
+    model.add(Dropout(0.5))  # Dropout
+    #model.add(Dense(32, activation='relu'))  # Outra camada oculta
+    #model.add(Dropout(0.5))  # Dropout
     model.add(Dense(len(np.unique(y_encoded)), activation='softmax'))  # Camada de saída
-    model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    adam_param = Adam(learning_rate=0.0001)
+    model.compile(loss='sparse_categorical_crossentropy', optimizer=adam_param, metrics=['accuracy'])
 
     return model
 
 
 # Executar o treinamento e aprendizado do modelo
 def kbann_exe():
-
     # Hiperparâmetros:
+    #  X_train e y_train -> Dados de entrada (X_train) e rótulos correspondentes (y_train) para treinamento.
+    #  epochs=50: O número de iterações completas através do conjunto de dados de treinamento. Cada época permite que o
+    #  modelo aprenda mais sobre os dados.
+    #  batch_size=64: Número de amostras usadas antes de atualizar os pesos no modelo. Um tamanho de lote menor evita
+    #  sobrecarga da memória, mas pode tornar o treinamento mais ruidoso.
+    #  verbose=1: Define nível de detalhes durante o treinamento. O valor de 1 mostra a barra de progresso.
+
+    early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+    folds = 30  # Nro. vezes para a validação cruzada
+    kfold = KFold(n_splits=folds, shuffle=True, random_state=42)
+    accuracies = []
+    error_rates = {0: [], 1: [], 2: []}  # Dic. para armazenar erros por rótulos IE, EI e NEITHER
+    total_conf_matrix = np.zeros((len(np.unique(y_encoded)), len(np.unique(y_encoded))))  # Para a matriz de confusão final
+
+    # Taxas de erros por rótulos IE, EI e NEITHER
+    labels = {0: 'EI', 1: 'IE', 2: 'NEITHER'}  # Assumindo que 0, 1, e 2 são os rótulos das classes
+
+    for train_index, test_index in kfold.split(X):
+        # Dividindo os dados em treino e teste
+        X_train, X_test = X_encoded[train_index], X_encoded[test_index]
+        y_train, y_test = y_encoded[train_index], y_encoded[test_index]
+
+        # Criar e treinar o modelo
+        kbann_model = modelo_kbann(X_train.shape[1])
+        kbann_model.fit(X_train, y_train, epochs=200, batch_size=64, verbose=0,
+                        validation_data=(X_test, y_test), callbacks=[early_stopping])
+
+        # Avaliação
+        y_pred = np.argmax(kbann_model.predict(X_test), axis=-1)
+        accuracy = accuracy_score(y_test, y_pred)
+        accuracies.append(accuracy)
+        conf_matrix = confusion_matrix(y_test, y_pred)
+        total_conf_matrix += conf_matrix
+
+        for label_index in range(len(labels)):
+            true_positives = conf_matrix[label_index, label_index]  # Verdadeiros positivos
+            false_negatives = conf_matrix[label_index, :].sum() - true_positives  # Falsos negativos
+            false_positives = conf_matrix[:, label_index].sum() - true_positives  # Falsos positivos
+
+            # Cálculo
+            total = true_positives + false_negatives + false_positives
+            if total > 0:
+                error_rate = (false_positives + false_negatives) / total
+                error_rates[label_index].append(error_rate)  # Armazena a taxa de erro
+            else:
+                error_rates[label_index].append(None)  # Para evitar divisão por zero se total for 0
+
+        # Relatório de classificação
+        print("\nResultados do KBANN:")
+        print("\nMatriz de Confusão:\n", confusion_matrix(y_test, y_pred))
+        print(classification_report(y_test, y_pred))
+
+    print(f"Acurácias em cada fold: {accuracies}")
+    print(f"Acurácia média: {np.mean(accuracies):.2f}")
+    print(f"Desvio padrão da acurácia: {np.std(accuracies):.2f}")
+
+    # Cálculos e impressão das taxas de erro finais por rótulo
+    for label_index, label in labels.items():
+        if len(error_rates[label_index]) > 0:
+            avg_error_rate = np.mean(error_rates[label_index])
+            std_error_rate = np.std(error_rates[label_index])
+            print(f'Taxa de erro média para {label}: {avg_error_rate:.2%} (Desvio Padrão: {std_error_rate:.2%})')
+        else:
+            print(f'Taxa de erro para {label}: Não disponível')
+
+    # Impressão da matriz de confusão total
+    print("\nMatriz de Confusão Total:\n", total_conf_matrix)
+
+    # for label_index in range(len(labels)):
+    #     true_positives = conf_matrix[label_index, label_index]  # Verdadeiros positivos
+    #     false_negatives = conf_matrix[label_index, :].sum() - true_positives  # Falsos negativos
+    #     false_positives = conf_matrix[:, label_index].sum() - true_positives  # Falsos positivos
     #
-    kbann_model = create_kbann_model(X_train.shape[1])
-    kbann_model.fit(X_train, y_train, epochs=50, batch_size=64, verbose=1)
-    kbann_model.summary()
+    #     # Cálculo
+    #     total = true_positives + false_negatives + false_positives
+    #     if total > 0:
+    #         error_rate = (false_positives + false_negatives) / total
+    #     else:
+    #         error_rate = None  # Para evitar divisão por zero se total for 0
+    #     print(
+    #         f'Taxa de erro para {labels[label_index]}: {error_rate:.2%}' if error_rate is not None else f'Taxa de erro para {labels[label_index]}: Não disponível')
+
+    #kbann_model = modelo_kbann(X_train.shape[1])
+    #kbann_model.fit(X_train, y_train, epochs=400, batch_size=192, verbose=0)
+    #kbann_model.summary()
 
     # Avaliação
-    kbann_y_pred = np.argmax(kbann_model.predict(X_test), axis=-1)
+    #kbann_y_pred = np.argmax(kbann_model.predict(X_test), axis=-1)
 
     # Resultados
-    print("\nResultados do KBANN:")
-    print(confusion_matrix(y_test, kbann_y_pred))
-    print(classification_report(y_test, kbann_y_pred))
-    print("Accuracy:", accuracy_score(y_test, kbann_y_pred))
+    #print("\nResultados do KBANN:")
+    #print(confusion_matrix(y_test, kbann_y_pred))
+    #print(classification_report(y_test, kbann_y_pred))
+    #print("Accuracy:", accuracy_score(y_test, kbann_y_pred))
+    #
+
+kbann_exe()
