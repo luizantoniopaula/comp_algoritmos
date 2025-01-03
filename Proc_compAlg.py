@@ -22,6 +22,9 @@ from sklearn.model_selection import KFold
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.callbacks import EarlyStopping
+from kabnn-optimization import *
+
+
 
 # Define padrões de Data e Hora para o Brasil
 locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
@@ -152,9 +155,9 @@ def modelo_kbann(input_dim):
     #model.add(Dense(128, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
     #model.add(Dropout(0.5))  # Dropout
     model.add(Dense(64, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
-    model.add(Dropout(0.5))  # Dropout
+    model.add(Dropout(0.7))  # Dropout
     model.add(Dense(32, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
-    model.add(Dropout(0.5))  # Dropout
+    model.add(Dropout(0.7))  # Dropout
     #model.add(Dense(32, activation='relu'))  # Outra camada oculta
     #model.add(Dropout(0.5))  # Dropout
     model.add(Dense(len(np.unique(y_encoded)), activation='softmax'))  # Camada de saída
@@ -175,7 +178,7 @@ def kbann_exe():
     #  verbose=1: Define nível de detalhes durante o treinamento. O valor de 1 mostra a barra de progresso.
 
     early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
-    folds = 30  # Nro. vezes para a validação cruzada
+    folds = 40  # Nro. vezes para a validação cruzada
     kfold = KFold(n_splits=folds, shuffle=True, random_state=42)
     accuracies = []
     error_rates = {0: [], 1: [], 2: []}  # Dic. para armazenar erros por rótulos IE, EI e NEITHER
@@ -191,7 +194,7 @@ def kbann_exe():
 
         # Criar e treinar o modelo
         kbann_model = modelo_kbann(X_train.shape[1])
-        kbann_model.fit(X_train, y_train, epochs=200, batch_size=64, verbose=0,
+        kbann_model.fit(X_train, y_train, epochs=100, batch_size=16, verbose=0,
                         validation_data=(X_test, y_test), callbacks=[early_stopping])
 
         # Avaliação
@@ -263,4 +266,6 @@ def kbann_exe():
     #print("Accuracy:", accuracy_score(y_test, kbann_y_pred))
     #
 
-kbann_exe()
+#kbann_exe()
+KABNNOptimizer.optimize_kabnn(X,y)
+
