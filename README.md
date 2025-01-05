@@ -96,7 +96,13 @@ Os ajustes dos hiperparâmetros foram realizados e discutidos nos códigos em Py
 
 **Sobre a Rede Neural KBANN**
 
-Este algoritmo combina redes neurais com conhecimento pré-existente. Na prática, não tendo uma implementação padrão do KBANN nas bibliotecas mais comuns de Python como TensorFlow ou PyTorch. A implementação geralmente envolve uma estrutura manual para utilizar conhecimento aprendido e previamente estabelecido na arquitetura da rede. Mais detalhes e características dessa Rede Neural, podem ser obtidas no documento adicional elaborado para o presente trabalho, disponível na pasta [docs/Algoritmos_IA_Descricoes.pdf]()
+Este algoritmo combina redes neurais com conhecimento pré-existente. Na prática, não tendo uma implementação padrão do KBANN nas bibliotecas mais comuns de Python como TensorFlow ou PyTorch. A implementação geralmente envolve uma estrutura manual para utilizar conhecimento aprendido e previamente estabelecido na arquitetura da rede. Mais detalhes e características dessa Rede Neural, podem ser obtidas no documento adicional elaborado para o presente trabalho, disponível na pasta [docs/Algoritmos_IA_Descricoes.pdf](https://github.com/luizantoniopaula/comp_algoritmos/blob/main/docs/Algoritmos_IA_Descricoes.pdf)
+
+Ao utilizar a rede neural KBANN, foram necessários inúmeros ajustes dos hiperparâmetros para que conseguissemos nos aproximar dos valores apresentados na base de dados compartilhados para uso em pesquisas com IA/Machine Learning, da [Universidade de Irvine/CA.](https://archive.ics.uci.edu/dataset/69/molecular+biology+splice+junction+gene+sequences)
+
+
+
+
 
 
 ## Sobre o Trabalho
