@@ -88,9 +88,15 @@ Os objetivos principais neste trabalho é apresentar perspectivas de aplicação
   - [SVM Classifier](https://link.springer.com/article/10.1007/BF00994018)
   - [MLP Classifier - Multi Layer Perceptron](https://www.semanticscholar.org/paper/Learning-representations-by-back-propagating-errors-Rumelhart-Hinton/052b1d8ce63b07fec3de9dbb583772d860b7c769)
 
+Importante lembrar que as teorias aqui apresentadas, especificamente sobre o sequenciamento de DNA e suas interpretações nas questões do Domínio Sequencial, não estão num formalismo acadêmico, mas foram adicionadas para contextualizar o problema que foi objeto para a aplicação dos algoritmos, e ajustes dos seus respectivos hiperparâmetros. Entretanto colocamos os links para os temas abordadas, caso haja interesse para melhor entendimento e esclarecimentos.
+
 Os ajustes dos hiperparâmetros foram realizados e discutidos nos códigos em Python, dentro das funções que executam cada algoritmo individual, e seus resultados foram apresentados de forma gráfica e também discutidos e apresentados no item Resultados abaixo.
 
 ## Resultados
+
+**Sobre a Rede Neural KBANN**
+
+Este algoritmo combina redes neurais com conhecimento pré-existente. Na prática, não tendo uma implementação padrão do KBANN nas bibliotecas mais comuns de Python como TensorFlow ou PyTorch. A implementação geralmente envolve uma estrutura manual para utilizar conhecimento aprendido e previamente estabelecido na arquitetura da rede.
 
 
 ## Sobre o Trabalho
