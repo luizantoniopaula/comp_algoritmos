@@ -2,29 +2,32 @@
 #
 # Análise de sequências de nucleotídeos ATGC de DNA
 #
-import os
 import locale
+import os.path
+import sys
 import warnings
+
 import numpy as np
 import pandas as pd
-import ucimlrepo
-from ucimlrepo import fetch_ucirepo
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
-from sklearn.neural_network import MLPClassifier
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Input
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.model_selection import KFold
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.svm import SVC
+from ucimlrepo import fetch_ucirepo
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Desativa o uso da GPU
+from tensorflow import get_logger, random
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Dense, Dropout, Input
+from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
-from tensorflow.keras.callbacks import EarlyStopping
-from kabnn-optimization import *
 
-
+#  Define o path dos arquivos Python
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Define padrões de Data e Hora para o Brasil
 locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
@@ -32,13 +35,13 @@ locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
 warnings.filterwarnings('ignore')
 # Definições de nível de Log
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # 1: INFO, 2: WARNING, 3: ERROR
-tf.get_logger().setLevel('ERROR')  # Configura apenas erros a serem exibidos
+get_logger().setLevel('ERROR')  # Configura apenas erros a serem exibidos
 
 # Definindo a semente para numpy
 np.random.seed(42)
 
 # Definindo a semente para TensorFlow
-tf.random.set_seed(42)
+random.set_seed(42)
 
 #
 # Carregar o conjunto de dados
@@ -155,9 +158,9 @@ def modelo_kbann(input_dim):
     #model.add(Dense(128, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
     #model.add(Dropout(0.5))  # Dropout
     model.add(Dense(64, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
-    model.add(Dropout(0.7))  # Dropout
+    model.add(Dropout(0.5))  # Dropout
     model.add(Dense(32, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
-    model.add(Dropout(0.7))  # Dropout
+    model.add(Dropout(0.5))  # Dropout
     #model.add(Dense(32, activation='relu'))  # Outra camada oculta
     #model.add(Dropout(0.5))  # Dropout
     model.add(Dense(len(np.unique(y_encoded)), activation='softmax'))  # Camada de saída
@@ -178,7 +181,7 @@ def kbann_exe():
     #  verbose=1: Define nível de detalhes durante o treinamento. O valor de 1 mostra a barra de progresso.
 
     early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
-    folds = 40  # Nro. vezes para a validação cruzada
+    folds = 20  # Nro. vezes para a validação cruzada
     kfold = KFold(n_splits=folds, shuffle=True, random_state=42)
     accuracies = []
     error_rates = {0: [], 1: [], 2: []}  # Dic. para armazenar erros por rótulos IE, EI e NEITHER
@@ -188,6 +191,10 @@ def kbann_exe():
     labels = {0: 'EI', 1: 'IE', 2: 'NEITHER'}  # Assumindo que 0, 1, e 2 são os rótulos das classes
 
     for train_index, test_index in kfold.split(X):
+
+        print("Valores de X:", X)
+        print("Dados de X:", X.shape)
+        print("Dados de X_encoded", X_encoded)
         # Dividindo os dados em treino e teste
         X_train, X_test = X_encoded[train_index], X_encoded[test_index]
         y_train, y_test = y_encoded[train_index], y_encoded[test_index]
@@ -238,34 +245,5 @@ def kbann_exe():
     # Impressão da matriz de confusão total
     print("\nMatriz de Confusão Total:\n", total_conf_matrix)
 
-    # for label_index in range(len(labels)):
-    #     true_positives = conf_matrix[label_index, label_index]  # Verdadeiros positivos
-    #     false_negatives = conf_matrix[label_index, :].sum() - true_positives  # Falsos negativos
-    #     false_positives = conf_matrix[:, label_index].sum() - true_positives  # Falsos positivos
-    #
-    #     # Cálculo
-    #     total = true_positives + false_negatives + false_positives
-    #     if total > 0:
-    #         error_rate = (false_positives + false_negatives) / total
-    #     else:
-    #         error_rate = None  # Para evitar divisão por zero se total for 0
-    #     print(
-    #         f'Taxa de erro para {labels[label_index]}: {error_rate:.2%}' if error_rate is not None else f'Taxa de erro para {labels[label_index]}: Não disponível')
 
-    #kbann_model = modelo_kbann(X_train.shape[1])
-    #kbann_model.fit(X_train, y_train, epochs=400, batch_size=192, verbose=0)
-    #kbann_model.summary()
-
-    # Avaliação
-    #kbann_y_pred = np.argmax(kbann_model.predict(X_test), axis=-1)
-
-    # Resultados
-    #print("\nResultados do KBANN:")
-    #print(confusion_matrix(y_test, kbann_y_pred))
-    #print(classification_report(y_test, kbann_y_pred))
-    #print("Accuracy:", accuracy_score(y_test, kbann_y_pred))
-    #
-
-#kbann_exe()
-KABNNOptimizer.optimize_kabnn(X,y)
-
+kbann_exe()
