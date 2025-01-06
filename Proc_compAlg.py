@@ -79,7 +79,7 @@ y_encoded = label_encoder.fit_transform(y) # .to_numpy().ravel()) # Problemas na
 X_train, X_test, y_train, y_test = train_test_split(X_encoded, y_encoded, test_size=0.2, random_state=42)
 
 # Mostrando índices dos rótulos e valores
-print("Índices dos rótulos:", y_encoded)
+print("Rótulos codificados:", y_encoded)
 # print("Tipo de dado dos rótulos: ", type(y))
 print("Rótulos originais:", np.unique(y))  # y são os rótulos originais
 
@@ -151,15 +151,15 @@ def modelo_kbann(input_dim):
     #  classificação com classes de valores inteiros. Para saídas não codificadas one-hot.
     #  optimizer='adam' -> Adam é um algoritmo de otimização eficiente que ajusta as taxas de aprendizado durante o treinamento.
     #  metrics=['accuracy'] -> métrica a ser monitorada durante o treinamento e a avaliação, neste caso, a acurácia do modelo.
-    model = Sequential()
+    model = Sequential()  # empilha camadas de forma linear, onde a saída de uma camada é a entrada da próxima.
     model.add(Input(shape=(input_dim,)))  # Camada de entrada usando Input
     #model.add(Dense(256, activation='relu', kernel_regularizer=l2(0.01)))  # Camada oculta
     #model.add(Dropout(0.5))  # Dropout para reduzir overfitting, é uma das técnicas de regularização para combater o overfitting.
-    #model.add(Dense(128, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
-    #model.add(Dropout(0.5))  # Dropout
-    model.add(Dense(64, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
+    model.add(Dense(128, activation='relu')) # , kernel_regularizer=l2(0.01)))  # Outra camada oculta
     model.add(Dropout(0.5))  # Dropout
-    model.add(Dense(32, activation='relu', kernel_regularizer=l2(0.01)))  # Outra camada oculta
+    model.add(Dense(64, activation='relu'))  # , kernel_regularizer=l2(0.01)))  # Outra camada oculta
+    model.add(Dropout(0.5))  # Dropout
+    model.add(Dense(32, activation='relu')) # , kernel_regularizer=l2(0.01)))  # Outra camada oculta
     model.add(Dropout(0.5))  # Dropout
     #model.add(Dense(32, activation='relu'))  # Outra camada oculta
     #model.add(Dropout(0.5))  # Dropout
@@ -192,9 +192,6 @@ def kbann_exe():
 
     for train_index, test_index in kfold.split(X):
 
-        print("Valores de X:", X)
-        print("Dados de X:", X.shape)
-        print("Dados de X_encoded", X_encoded)
         # Dividindo os dados em treino e teste
         X_train, X_test = X_encoded[train_index], X_encoded[test_index]
         y_train, y_test = y_encoded[train_index], y_encoded[test_index]
