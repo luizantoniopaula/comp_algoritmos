@@ -8,7 +8,7 @@ Este conjunto de dados **(que vamos utilizar nessas availiações)** foi desenvo
 
 | System |Neither|  EI | IE  |
 |:-----:|------:|-----:|-----:|
-|KBANN  |  4.62 |  7.56|  8.47|
+| **KBANN**  |  **4.62** |  **7.56** |  **8.47** |
 |BACKPROP| 5.29 |  5.74| 10.75|
 |PEBLS | 6.86| 8.18| 7.55|
 |PERCEPTRON| 3.99| 16.32| 17.41|
@@ -92,13 +92,26 @@ Importante lembrar que as teorias aqui apresentadas, especificamente sobre o seq
 
 Os ajustes dos hiperparâmetros foram realizados e discutidos nos códigos em Python, dentro das funções que executam cada algoritmo individual, e seus resultados foram apresentados de forma gráfica e também discutidos e apresentados no item Resultados abaixo.
 
+A comparação entre algoritmos foi realizada não levando-se em consideração o tempo de processamento, mas sim os resultados práticos e qualitativos como a **acurácia** gerada por cada algoritmos, assim como as **taxas de erros percentuais** geradas para cada classe avaliada, no caso as classe **EI, IE e N**.
+
 ## Resultados
 
 **Sobre a Rede Neural KBANN**
 
 Este algoritmo combina redes neurais com conhecimento pré-existente. Na prática, não tendo uma implementação padrão do KBANN nas bibliotecas mais comuns de Python como TensorFlow ou PyTorch. A implementação geralmente envolve uma estrutura manual para utilizar conhecimento aprendido e previamente estabelecido na arquitetura da rede. Mais detalhes e características dessa Rede Neural, podem ser obtidas no documento adicional elaborado para o presente trabalho, disponível na pasta [docs/Algoritmos_IA_Descricoes.pdf](https://github.com/luizantoniopaula/comp_algoritmos/blob/main/docs/Algoritmos_IA_Descricoes.pdf)
 
-Ao utilizar a rede neural KBANN, foram necessários inúmeros ajustes dos hiperparâmetros para que conseguissemos nos aproximar dos valores apresentados na base de dados compartilhados para uso em pesquisas com IA/Machine Learning, da [Universidade de Irvine/CA.](https://archive.ics.uci.edu/dataset/69/molecular+biology+splice+junction+gene+sequences)
+Ao utilizar a rede neural KBANN, foram necessários inúmeros ajustes dos hiperparâmetros para que conseguissemos nos aproximar dos valores apresentados na base de dados compartilhados para uso em pesquisas com IA/Machine Learning, da [Universidade de Irvine/CA.](https://archive.ics.uci.edu/dataset/69/molecular+biology+splice+junction+gene+sequences) e também descritos no inicio deste texto.
+
+Os seguintes hiperparâmetros foram diversas vezes alterados de forma sistêmica, mantendo-se valores pré-definidos, e então procedendo alterações dos valores para maior ou menor, sempre acompanhando a acurácia e os erros percentuais por classe analisada:
+
+| Hiperparâmetro | Valor Final | Descrição |
+|:--------------:|:-----------:|:---------:|
+| Dense(64...)   | 64          | Define o tamanho da camada da rede neural,oculta para 64 perceptrons |
+| activation     | relu        | Função de ativação utilizada, no caso foi a ReLU (Rectified Linear Unit), não foi alterada |
+| kernel_regularizer=l2(0.01)  | l2(0.01) | Ajusta penalização dos pesos maiores durante treinamento, ajudando no overfiting|
+| Dropout        | 0.5 | Desativa aleatóriamente 50% dos neurônidos da camada anterior, no treinamento ajuda prevenir overfitting|individuais. Isso promove uma generalização melhor do modelo.
+|activation      | softmax     | Função de ativação 'softmax' transforma as saídas em probabilidades que somam a 1, para classificação multi-classe|
+
 
 
 
