@@ -106,11 +106,12 @@ Os seguintes hiperparâmetros foram diversas vezes alterados de forma sistêmica
 
 | Hiperparâmetro | Valor Final | Descrição |
 |:--------------:|:-----------:|:---------:|
-| Dense(64...)   | 64          | Define o tamanho da camada da rede neural,oculta para 64 perceptrons |
-| activation     | relu        | Função de ativação utilizada, no caso foi a ReLU (Rectified Linear Unit), não foi alterada |
-| kernel_regularizer=l2(0.01)  | l2(0.01) | Ajusta penalização dos pesos maiores durante treinamento, ajudando no overfiting|
-| Dropout        | 0.5 | Desativa aleatóriamente 50% dos neurônidos da camada anterior, no treinamento ajuda prevenir overfitting|individuais. Isso promove uma generalização melhor do modelo.
-|activation      | softmax     | Função de ativação 'softmax' transforma as saídas em probabilidades que somam a 1, para classificação multi-classe|
+| Dense(64...)   | 64  e 32        | Define o tamanho da camada da rede neural,oculta para 64 e 32 perceptrons |
+| activation     | relu        | Função de ativação utilizada nas camadas ocultas, no caso foi a ReLU (Rectified Linear Unit), não foi alterada |
+| Dropout        | 0.5 | Desativa aleatóriamente 50% dos neurônidos da camada anterior, no treinamento ajuda prevenir overfitting|individuais, não alterado.|
+|activation      | softmax     | Função de ativação na camada de saída, 'softmax' transforma as saídas em probabilidades que somam a 1, para classificação multi-classe|
+
+![image](https://github.com/user-attachments/assets/60035138-749f-462a-ae95-054e4ca9a119)
 
 
 
