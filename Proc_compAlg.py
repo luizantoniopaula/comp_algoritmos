@@ -153,10 +153,10 @@ def modelo_kbann(input_dim):
     #  metrics=['accuracy'] -> métrica a ser monitorada durante o treinamento e a avaliação, neste caso, a acurácia do modelo.
     model = Sequential()  # empilha camadas de forma linear, onde a saída de uma camada é a entrada da próxima.
     model.add(Input(shape=(input_dim,)))  # Camada de entrada usando Input
-    #model.add(Dense(256, activation='relu', kernel_regularizer=l2(0.01)))  # Camada oculta
+    #model.add(Dense(256, activation='relu'))  #, kernel_regularizer=l2(0.01)))  # Camada oculta
     #model.add(Dropout(0.5))  # Dropout para reduzir overfitting, é uma das técnicas de regularização para combater o overfitting.
-    model.add(Dense(128, activation='relu')) # , kernel_regularizer=l2(0.01)))  # Outra camada oculta
-    model.add(Dropout(0.5))  # Dropout
+    #model.add(Dense(128, activation='relu'))  # , kernel_regularizer=l2(0.01)))  # Outra camada oculta
+    #model.add(Dropout(0.5))  # Dropout
     model.add(Dense(64, activation='relu'))  # , kernel_regularizer=l2(0.01)))  # Outra camada oculta
     model.add(Dropout(0.5))  # Dropout
     model.add(Dense(32, activation='relu')) # , kernel_regularizer=l2(0.01)))  # Outra camada oculta
@@ -198,7 +198,7 @@ def kbann_exe():
 
         # Criar e treinar o modelo
         kbann_model = modelo_kbann(X_train.shape[1])
-        kbann_model.fit(X_train, y_train, epochs=100, batch_size=16, verbose=0,
+        kbann_model.fit(X_train, y_train, epochs=25, batch_size=4, verbose=0,
                         validation_data=(X_test, y_test), callbacks=[early_stopping])
 
         # Avaliação
