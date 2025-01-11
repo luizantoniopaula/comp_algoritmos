@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, cross_val_score, GridSearchCV
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
@@ -43,6 +43,8 @@ np.random.seed(42)
 # Definindo a semente para TensorFlow
 random.set_seed(42)
 
+labels = {0: 'EI', 1: 'IE', 2: 'NEITHER'}  # Assumindo que 0, 1, e 2 são os rótulos das classes
+
 #
 # Carregar o conjunto de dados
 molecular_biology_splice_junction_gene_sequences = fetch_ucirepo(id=69)
@@ -69,14 +71,43 @@ def encode_sequences(X):
     return one_hot_encoded.reshape(sequences.shape[0], -1)
 
 
+# Função para encode das sequências de DNA em formato numérico, para o SVM
+def one_hot_encode_dna(sequences):
+    """Codifica sequências de DNA em formato one-hot, reconhecendo automaticamente nucleotídeos únicos."""
+
+    # Se as sequências estiverem em um formato numpy, converta para lista
+    if isinstance(sequences, np.ndarray):
+        sequences = sequences.tolist()
+
+    # Garantindo que cada item em 'sequences' seja uma string
+    sequences = [''.join(seq) if isinstance(seq, list) else str(seq) for seq in sequences]
+
+    # Encontrar todos os nucleotídeos únicos
+    unique_nucleotides = sorted(set(''.join(sequences)))  # Concatena todas as sequências e encontra os únicos
+    nucleotide_dict = {nuc: idx for idx, nuc in enumerate(unique_nucleotides)}
+
+    # Inicializa a matriz de codificação
+    encoded_sequences = np.zeros((len(sequences), len(unique_nucleotides)))
+
+    for i, seq in enumerate(sequences):
+        for nucleotide in seq:
+            if nucleotide in nucleotide_dict:
+                encoded_sequences[i][nucleotide_dict[nucleotide]] = 1  # Define a posição correspondente a 1
+
+    return encoded_sequences
+
+
 X_encoded = encode_sequences(X)
 
 # Codificação das classes
 label_encoder = LabelEncoder()
-y_encoded = label_encoder.fit_transform(y) # .to_numpy().ravel()) # Problemas na função ravel() do numpy vindo de dataframe Pandas
+y_encoded = label_encoder.fit_transform(
+    y)  # .to_numpy().ravel()) # Problemas na função ravel() do numpy vindo de dataframe Pandas
 
 # Divisão em treino e teste (20% para teste e 80% para treinamento)
 X_train, X_test, y_train, y_test = train_test_split(X_encoded, y_encoded, test_size=0.2, random_state=42)
+
+error_rates = {0: [], 1: [], 2: []}  # Dic. para armazenar erros por rótulos IE, EI e NEITHER
 
 # Mostrando índices dos rótulos e valores
 print("Rótulos codificados:", y_encoded)
@@ -86,50 +117,128 @@ print("Rótulos originais:", np.unique(y))  # y são os rótulos originais
 
 # Treinamento com RandomForest
 def random_forest():
-    # Hiperparâmetros: n_estimators=100 -> árvores de decisão a serem utilizadas e,
-    # random_state=42 -> Valor da semente de aleatoriedade do estimador (ideal manter constante)
-    rf_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
-    rf_classifier.fit(X_train, y_train)
-    rf_y_pred = rf_classifier.predict(X_test)
+    # Hiperparâmetros: n_estimators=100 = árvores de decisão a serem utilizadas
+    # random_state=42: Valor da semente de aleatoriedade do estimador (ideal manter constante)
+    rf_classifier = RandomForestClassifier(n_estimators=400, random_state=42)
 
-    # Avaliação
-    print("Random Forest Results:")
-    print(confusion_matrix(y_test, rf_y_pred))
-    print(classification_report(y_test, rf_y_pred))
-    print("Accuracy:", accuracy_score(y_test, rf_y_pred))
+    # Inicializa K-Folds
+    kf = KFold(n_splits=20, shuffle=True, random_state=42)
+
+    accuracy_scores = []
+    total_conf_matrix = np.zeros(
+        (len(np.unique(y_encoded)), len(np.unique(y_encoded))))  # Para a matriz de confusão final
+
+    # Realiza a validação cruzada
+    for train_index, test_index in kf.split(X):
+        X_train, X_test = X_encoded[train_index], X_encoded[test_index]
+        y_train, y_test = y_encoded[train_index], y_encoded[test_index]
+
+        # Treinamento do modelo
+        rf_classifier.fit(X_train, y_train)
+
+        # Predições
+        rf_y_pred = rf_classifier.predict(X_test)
+
+        # Avaliação
+        accuracy = accuracy_score(y_test, rf_y_pred)
+        accuracy_scores.append(accuracy)
+        conf_matrix = confusion_matrix(y_test, rf_y_pred)
+        total_conf_matrix += conf_matrix
+
+        for label_index in range(len(labels)):
+            true_positives = conf_matrix[label_index, label_index]  # Verdadeiros positivos
+            false_negatives = conf_matrix[label_index, :].sum() - true_positives  # Falsos negativos
+            false_positives = conf_matrix[:, label_index].sum() - true_positives  # Falsos positivos
+
+            # Cálculo
+            total = true_positives + false_negatives + false_positives
+            if total > 0:
+                error_rate = (false_positives + false_negatives) / total
+                error_rates[label_index].append(error_rate)  # Armazena a taxa de erro
+            else:
+                error_rates[label_index].append(None)  # Para evitar divisão por zero se total for 0
+
+        # Seleção de métricas adicionais para verificação
+        print("Matriz de confusão:")
+        print(confusion_matrix(y_test, rf_y_pred))
+        print(classification_report(y_test, rf_y_pred))
+        print(f"Acurácia do modelo para esse fold: {accuracy:.2f}")
+    # Acurácia média
+    print(f"Acurácia média: {np.mean(accuracy_scores):.2f}")
+    print(f"Desvio padrão da acurácia: {np.std(accuracy_scores):.2f}")
+
+    # Cálculos e impressão das taxas de erro finais por rótulo
+    for label_index, label in labels.items():
+        if len(error_rates[label_index]) > 0:
+            avg_error_rate = np.mean(error_rates[label_index])
+            std_error_rate = np.std(error_rates[label_index])
+            print(f'Taxa de erro média para {label}: {avg_error_rate:.2%} (Desvio Padrão: {std_error_rate:.2%})')
+        else:
+            print(f'Taxa de erro para {label}: Não disponível')
+
+    # Impressão da matriz de confusão total
+    print("\nMatriz de Confusão Total:\n", total_conf_matrix)
 
 
-#
-# Treinamento em SVM - Support Vector Machine
-def svm_exec():
-    # Hiperparâmetros: kernel=linear, para classes que podem ser separadas linearmente
-    # random_state=42 -> Valor da semente de aleatoriedade do estimador (ideal manter constante)
-    svm_classifier = SVC(kernel='linear', random_state=42)
-    svm_classifier.fit(X_train, y_train)
-    svm_y_pred = svm_classifier.predict(X_test)
+# Treinamento em SVM com K-Folds e otimização de hiperparâmetros
+def svm_exec(X, y):
 
-    # Avaliação
-    print("\nSVM Results:")
-    print(confusion_matrix(y_test, svm_y_pred))
-    print(classification_report(y_test, svm_y_pred))
-    print("Accuracy:", accuracy_score(y_test, svm_y_pred))
+    kfolds=20
+    # Codificando as sequências de DNA
+    X_encoded = one_hot_encode_dna(X)
 
+    # Verifique se os rótulos (y) são strings e os converta para labels numéricos
+    if isinstance(y[0], str):
+        label_encoder = LabelEncoder()
+        y = label_encoder.fit_transform(y)
 
-#
-# Treinamento em Rede Neural MLP
-def mlp_exec():
-    # Hiperparâmetros:
-    #  hidden_layer_sizes=(100,) usando 100 neurônios (perceptrons) na camada oculta única
-    #  max_iter=300 = máximo de iterações (épocas) para o algoritmo de otimização durante o treinamento.
-    mlp_classifier = MLPClassifier(hidden_layer_sizes=(100,), max_iter=300, random_state=42)
-    mlp_classifier.fit(X_train, y_train)
-    mlp_y_pred = mlp_classifier.predict(X_test)
+    # Definindo um espaço de busca para hiperparâmetros
+    param_grid = {
+        'C': [0.1, 1, 10, 100, 1000],
+        'kernel': ['linear', 'rbf', 'sigmoid'],
+        'gamma': ['scale', 'auto', 0.01, 0.1, 1]
+    }
 
-    # Avaliação
-    print("\nResultados pela Rede Neural MLPClassifier:")
-    print(confusion_matrix(y_test, mlp_y_pred))
-    print(classification_report(y_test, mlp_y_pred))
-    print("Accuracy:", accuracy_score(y_test, mlp_y_pred))
+    # Uso de GridSearchCV para otimização de hiperparâmetros
+    grid_search = GridSearchCV(SVC(random_state=42), param_grid, cv=kfolds, scoring='accuracy', error_score='raise')
+
+    # Implementando um try-except para capturar erros no fit
+    try:
+        grid_search.fit(X_encoded, y)
+    except Exception as e:
+        print("An error occurred during GridSearchCV fitting:", e)
+        return
+
+    # Modelo SVM otimizado
+    best_svm_classifier = grid_search.best_estimator_
+
+    # K-Folds para avaliação do modelo
+    kf = KFold(n_splits=kfolds, shuffle=True, random_state=42)
+    accuracy_scores = []
+
+    for train_index, test_index in kf.split(X_encoded):
+        X_train, X_test = X_encoded[train_index], X_encoded[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+
+        # Treinamento do modelo otimizado
+        best_svm_classifier.fit(X_train, y_train)
+
+        # Predições
+        svm_y_pred = best_svm_classifier.predict(X_test)
+
+        # Avaliação
+        accuracy = accuracy_score(y_test, svm_y_pred)
+        accuracy_scores.append(accuracy)
+
+        # Seleção de métricas adicionais para verificação
+        print("Confusion Matrix:")
+        print(confusion_matrix(y_test, svm_y_pred))
+        print(classification_report(y_test, svm_y_pred))
+        print("Accuracy for this fold:", accuracy)
+
+    # Acurácia média
+    print("Average Accuracy across all folds:", np.mean(accuracy_scores))
+    print("Best Hyperparameters:", grid_search.best_params_)
 
 
 #
@@ -159,7 +268,7 @@ def modelo_kbann(input_dim):
     #model.add(Dropout(0.5))  # Dropout
     model.add(Dense(64, activation='relu'))  # , kernel_regularizer=l2(0.01)))  # Outra camada oculta
     model.add(Dropout(0.5))  # Dropout
-    model.add(Dense(32, activation='relu')) # , kernel_regularizer=l2(0.01)))  # Outra camada oculta
+    model.add(Dense(32, activation='relu'))  # , kernel_regularizer=l2(0.01)))  # Outra camada oculta
     model.add(Dropout(0.5))  # Dropout
     #model.add(Dense(32, activation='relu'))  # Outra camada oculta
     #model.add(Dropout(0.5))  # Dropout
@@ -184,8 +293,8 @@ def kbann_exe():
     folds = 20  # Nro. vezes para a validação cruzada
     kfold = KFold(n_splits=folds, shuffle=True, random_state=42)
     accuracies = []
-    error_rates = {0: [], 1: [], 2: []}  # Dic. para armazenar erros por rótulos IE, EI e NEITHER
-    total_conf_matrix = np.zeros((len(np.unique(y_encoded)), len(np.unique(y_encoded))))  # Para a matriz de confusão final
+    total_conf_matrix = np.zeros(
+        (len(np.unique(y_encoded)), len(np.unique(y_encoded))))  # Para a matriz de confusão final
 
     # Taxas de erros por rótulos IE, EI e NEITHER
     labels = {0: 'EI', 1: 'IE', 2: 'NEITHER'}  # Assumindo que 0, 1, e 2 são os rótulos das classes
@@ -243,4 +352,85 @@ def kbann_exe():
     print("\nMatriz de Confusão Total:\n", total_conf_matrix)
 
 
-kbann_exe()
+# Rede Neural Multicamada
+def mlp_exec():
+
+    kf = KFold(n_splits=10, shuffle=True, random_state=42)
+
+    # Determinando o número de classes
+    unique_classes = np.unique(y)
+    num_classes = len(unique_classes)
+
+    accuracy_scores = []
+    total_confusion_matrix = np.zeros((num_classes, num_classes))  # Matriz de confusão acumulada
+    error_rates = [[] for _ in range(num_classes)]  # Listas para armazenar taxas de erro por classe
+    # Taxas de erros por rótulos IE, EI e NEITHER
+    labels = {0: 'EI', 1: 'IE', 2: 'NEITHER'}  # Assumindo que 0, 1, e 2 são os rótulos das classes
+
+    # Loop para validação cruzada KFold
+    for train_index, test_index in kf.split(X):
+        X_train, X_test = X_encoded[train_index], X_encoded[test_index]
+        y_train, y_test = y_encoded[train_index], y_encoded[test_index]
+
+        # Hiperparâmetros
+        mlp_classifier = MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=150, random_state=42)
+
+        # Treinamento do modelo
+        mlp_classifier.fit(X_train, y_train)
+
+        # Predições
+        mlp_y_pred = mlp_classifier.predict(X_test)
+
+        # Avaliação
+        accuracy = accuracy_score(y_test, mlp_y_pred)
+        accuracy_scores.append(accuracy)
+
+        # Matriz de confusão para o fold atual
+        conf_matrix = confusion_matrix(y_test, mlp_y_pred)
+        total_confusion_matrix += conf_matrix  # Atualiza a matriz de confusão acumulada
+
+        # Cálculo das taxas de erro por classe
+        for label_index in range(len(labels)):
+            true_positives = conf_matrix[label_index, label_index]  # Verdadeiros positivos
+            false_negatives = conf_matrix[label_index, :].sum() - true_positives  # Falsos negativos
+            false_positives = conf_matrix[:, label_index].sum() - true_positives  # Falsos positivos
+
+            # Cálculo
+            total = true_positives + false_negatives + false_positives
+            if total > 0:
+                error_rate = (false_positives + false_negatives) / total
+                error_rates[label_index].append(error_rate)  # Armazena a taxa de erro
+            else:
+                error_rates[label_index].append(None)  # Para evitar divisão por zero se total for 0
+
+        # Relatório de classificação
+        print("\nResultados da rede MLP:")
+        print("\nMatriz de Confusão:\n", confusion_matrix(y_test, mlp_y_pred))
+        print(classification_report(y_test, mlp_y_pred))
+
+    print(f"Acurácias em cada fold: {accuracy_scores}")
+    print(f"Acurácia média: {np.mean(accuracy_scores):.2f}")
+    print(f"Desvio padrão da acurácia: {np.std(accuracy_scores):.2f}")
+
+    # Cálculos e impressão das taxas de erro finais por rótulo
+    for label_index, label in labels.items():
+        if len(error_rates[label_index]) > 0:
+            avg_error_rate = np.mean(error_rates[label_index])
+            std_error_rate = np.std(error_rates[label_index])
+            print(f'Taxa de erro média para {label}: {avg_error_rate:.2%} (Desvio Padrão: {std_error_rate:.2%})')
+        else:
+            print(f'Taxa de erro para {label}: Não disponível')
+
+    # Impressão da matriz de confusão total
+    print("\nMatriz de Confusão Total:\n", total_confusion_matrix)
+# Exemplo de uso:
+
+
+
+# kbann_exe()  #  Caso deseje executar a rede neural KBANN
+
+# random_forest()  #  Caso deseje executar o classificador RandoForest
+
+#svm_exec(X, y)  # Caso deseje executar a rede SVM Suport Vector Machine
+
+mlp_exec()  # Caso deseje executar a rede MLP - Multilayer Perceptron
