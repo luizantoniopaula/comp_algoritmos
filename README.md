@@ -158,7 +158,38 @@ Mesmo tendo **reduzido** a taxa de erros nas séries **EI para 7,09% e NEITHER p
 
 ----
 
+**Sobre a Rede Neural MLP - Multi Layer Perceptron**
 
+Este algoritmo é um tipo de rede neural feedforward composta por pelo menos três camadas de nós: uma camada de entrada, uma ou mais camadas ocultas e uma camada de saída. Cada nó (neurônio) em uma camada usa uma função de ativação não linear, exceto pelos nós de entrada. MLPs são capazes de aprender representações não lineares complexas, tornando-os adequados para tarefas de classificação e regressão.
+
+Os seguintes hiperparâmetros foram alterados de forma sistêmica, mantendo-se valores pré-definidos, e então procedendo alterações dos valores para maior ou menor, sempre acompanhando a acurácia e os erros percentuais por classe analisada:
+
+| Hiperparâmetro | Valor Final | Descrição |
+|:--------------:|:-----------:|:---------:|
+|hidden_layer_sizes| 128 x 64  | Define o tamanho da camada da rede neural,oculta para 128 e 64 perceptrons |
+| max_iter   | 200   | Número de iterações completas através do conjunto de dados de treinamento. Cada época permite que o modelo aprenda mais sobre os dados. |
+| n_splits           | 20   | Indica que, o conjunto de dados é dividido em 20 partes iguais. Cada **(split)** será usada como conjunto de validação uma vez,o restante dos dados é usado para treinamento.|
+
+![image](https://github.com/user-attachments/assets/758ce7e1-3384-484c-b29b-ee682951011b)
+
+Os resultados obtidos com esse algoritmo MLP foram os piores, em relação aos demais modelos. Notadamente a parametrização (hiperparâmetros) para este algoritmo é bem limitada, restringindo aos valores das camadas ocultas (hidden_layer_sizes), o número de iterações (max_iter) e as o número de conjuntos de dados para validação cruzada (n_splits). Não temos mais parâmetros como as funções de ativação, parâmetros Batch, funções perda (loss), Dropout, dentre outros parâmetros.
+
+Assim percebemos que, de fato é um algoritmo um pouco limitado, mas não houve tempo para procurar mais detalhes e talvez fazer ou utilizar versões mais aprimoradas do mesmo, entretanto para efeitos de comparação com os demais, podemos creditar a limitação de hiperparâmetros como um fator de diminui as possibilidades de acurácia deste algoritmo, em contraponto, por exemplo, com as redes KBANN.
+
+Os melhores resultados obtidos nesta rede neural foram: m **10,96%, 12,22%, 6,50%**, respectivamente para as suas séries EI, IE e NEITHER, tendo-se uma acurácia média de 0,95, ou seja, a menor de todos os algoritmos aqui testados.
+
+A planilha acima apresenta mais resultados deste algoritmo e facilita a visualização das opções de modificação nos hiperparâmetros, e os resultados alcançados, onde podemos ver que as evoluções foram muito pequenas, pelas variações de parâmetros.
+
+----
+### Conclusão
+
+Enfim, de todos os algoritmos testados, pelos resultados e simplicidade de parametrização, além do tempo de execução, o Random Forest apresentou resultados levementes superiores à rede neural KBANN. Entretanto esta última é de complexidade mais elevada de parametrização e exige mais tempo para testes e treinamento dos parâmetros. Devido ao tempo de execução, pode se tornar uma tarefa bem exaustiva e de difícil implementação, uma vez que a mudança de vários parâmetros pode produzir resultados inesperados, se não for realizada de maneira sistêmica e com acompanhamento e verificação dos resultados.
+
+É possível perceber que, a parametrização de algoritmos torna-se uma especialidade necessária, na medida que o emprego/utilização dessas ferramentas, de forma mais corriqueira nas empresas, vai impondo a necessidade desse conhecimento, e como consequência temos a necessidade de atualização quase constante no conhecimento dos algoritmos, seus hiperparâmetros e características fundamentais. Pois não devemos esquecer que, o tipo de problema para o qual devemos aplicar os algoritmos, são de extrema importância para que os mesmos consigam apresentar resultados satisfatórios e condizentes com seus objetivos primordiais.
+
+Em síntese, tais algorimtos devem ser empregados corretamente nas tarefas correspondentes, como Classificação, Agrupamento ou Regressão, ou seja, sempre há um algoritmo mais adequado para cada problema a ser resolvido ou respondido.
+
+Esta atividade cada dia que passa, pode se tornar uma arte!
 
 ----
 ## Sobre o Trabalho
