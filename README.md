@@ -79,7 +79,7 @@ A Teoria de Domínio Sequencial é fundamental para a biologia e genética moder
 
 ## Desenvolvimento do Trabalho
 
-Comparativo de algoritmos aplicados no problema das ***Junções de emenda (uniões) das Sequências de Genes (DNA) de Primatas*** é um exercício teórico relevante para nossa compreensão do funcionamento dos algoritmos e dos resultados que emergem de sua aplicação no problema descrito no contexto.
+Comparativo de algoritmos aplicados no problema das ***Junções de emenda (uniões) das Sequências de Genes (DNA) de Primatas*** é um exercício teórico/prático relevante para nossa compreensão do funcionamento dos algoritmos e dos resultados que emergem de sua aplicação no problema descrito no contexto.
 
 Os objetivos principais neste trabalho é apresentar perspectivas de aplicação de ***diferentes*** algoritmos de Inteligência Artificial, no problema acima descrito, o qual caracterizado como um problema de **classificação**. Mas não somente a utilização dos algoritmos, como também a escolha e justificativas dos Hiperparâmetros escolhidos, os quais sabidamente afetam os resultados obtidos, e que podem inviabilizar as comparações entre eles. Deste modo elencamos os seguintes algoritmos para tentar resolver o problema de classificação das sequências de DNA:
   
@@ -98,7 +98,9 @@ A comparação entre algoritmos foi realizada não levando-se em consideração 
 
 **Sobre a Rede Neural KBANN**
 
-Este algoritmo combina redes neurais com conhecimento pré-existente. Na prática, não tendo uma implementação padrão do KBANN nas bibliotecas mais comuns de Python como TensorFlow ou PyTorch. A implementação geralmente envolve uma estrutura manual para utilizar conhecimento aprendido e previamente estabelecido na arquitetura da rede. Mais detalhes e características dessa Rede Neural, podem ser obtidas no documento adicional elaborado para o presente trabalho, disponível na pasta [docs/Algoritmos_IA_Descricoes.pdf](https://github.com/luizantoniopaula/comp_algoritmos/blob/main/docs/Algoritmos_IA_Descricoes.pdf)
+Este algoritmo combina redes neurais com conhecimento pré-existente. Na prática, não tendo uma implementação padrão do KBANN nas bibliotecas mais comuns de Python como TensorFlow ou PyTorch. A implementação geralmente envolve uma estrutura manual para utilizar conhecimento aprendido e previamente estabelecido na arquitetura da rede.
+
+Mais detalhes e características dessa Rede Neural, podem ser obtidas no documento adicional elaborado para o presente trabalho, disponível na pasta [docs/Algoritmos_IA_Descricoes.pdf](https://github.com/luizantoniopaula/comp_algoritmos/blob/main/docs/Algoritmos_IA_Descricoes.pdf)
 
 Ao utilizar a rede neural KBANN, foram necessários inúmeros ajustes dos hiperparâmetros para que conseguissemos nos aproximar dos valores apresentados na base de dados compartilhados para uso em pesquisas com IA/Machine Learning, da [Universidade de Irvine/CA.](https://archive.ics.uci.edu/dataset/69/molecular+biology+splice+junction+gene+sequences) e também descritos no inicio deste texto.
 
@@ -109,16 +111,87 @@ Os seguintes hiperparâmetros foram diversas vezes alterados de forma sistêmica
 | Dense(64...)   | 64  e 32        | Define o tamanho da camada da rede neural,oculta para 64 e 32 perceptrons |
 | activation     | relu        | Função de ativação utilizada nas camadas ocultas, no caso foi a ReLU (Rectified Linear Unit), não foi alterada |
 | Dropout        | 0.5 | Desativa aleatóriamente 50% dos neurônidos da camada anterior, no treinamento ajuda prevenir overfitting|individuais, não alterado.|
-|activation      | softmax     | Função de ativação na camada de saída, 'softmax' transforma as saídas em probabilidades que somam a 1, para classificação multi-classe|
+|activation na saída    | softmax     | Função de ativação na camada de saída, 'softmax' transforma as saídas em probabilidades que somam a 1, para classificação multi-classe|
+| Epoch          | 50   | Número de iterações completas através do conjunto de dados de treinamento. Cada época permite que o modelo aprenda mais sobre os dados. |
+| Batch          | 8    | Número de amostras usadas antes de atualizar os pesos no modelo. Um tamanho de lote menor evita sobrecarga da memória, mas pode tornar o treinamento mais ruidoso.
+| fold           | 20   | Indica que, o conjunto de dados é dividido em 20 partes iguais. Cada **(fold)** será usada como conjunto de validação uma vez,o restante dos dados é usado para treinamento.|
 
-![image](https://github.com/user-attachments/assets/60035138-749f-462a-ae95-054e4ca9a119)
+![image](https://github.com/user-attachments/assets/3597cfe3-c2cc-4c7b-a75e-a7d556c0801b)
+
+Nos resultados obtidos, podemos perceber que não andiantou criar uma estrutura de redes neurais muito grande, pois a variação nos erros percentuais nas séries investigadas foi muito pequena. Se compararmos uma rede com 256 x 128 x 64 x 32, tendo 4 camadas ocultas, gerou uma taxa de erros de 10.33% na série EI, contra o melhor resultado de 8,11% na mesma série, agora obtido com uma rede de 64 x 32 neurônios nas camadas internas.
+
+A mudança desses valores foi seguida por ajustes nos tamanhos das partições das validações cruzadas (folds), que foram de **10 fold** no primeiro caso, subindo até **20 fold** no melhor caso. Também impactante verificar que o número dos parâmetros Epoch e Batch foram reduzidos drasticamente, de **300 epoch** e **192 batch**, para **50 epoch** e **8 batch**.
+
+O número de iterações completas através do conjunto de dados de treinamento, ou o parâmetro **Epoch**, permite que o modelo aprenda mais sobre os dados. Porém o grande valor inicial estava superestimado, pois verificou-se que sua redução foi mais impactante na redução dos erros percentuais por séries, da mesma forma que ocorreu com o número das redes neurais ocultas
+
+Juntamente com o parâmetro **Epch**, o parâmetro **Batch** também veio sendo reduzido em conjunto, tendo seu resultado final em **8 Batch**. Esse parâmetro é o número de amostras usadas antes de atualizar os pesos no modelo. Um tamanho de lote menor evita sobrecarga da memória, mas pode tornar o treinamento mais ruidoso. Entretanto, nos resultados obtidos, foi justamente a redução neste parâmetro que também contribuiu para redução nos erros percentuais nas séries. 
+
+Os parâmetros que ficaram fixos, na verdade foram objeto de testes, onde também alteramos seus valores, como o **Dropout de 0.5 para 0.3 e 0.7**, mas não houveram mudanças significativas nos resultados.
+Deste modo observamos que os hiperparâmetros ajustados foram os mais relevantes para a mudança nos resultados, reduzindo os erros %, mas manteve-se em todos os casos, a acurácia em 0.96.
+
+Concluindo, podemos observar que, os melhores resultados nos erros % das série **EI, IE e NEITHER** com esta rede KBANN, respectivamente **8,11%, 10,34% e 5,2%**, ainda estão longe dos resultados apresentados no site que hospeda a base de dados, os quais foram **7.56%, 8.47%, 4.62%**, respectivamente para as suas séries EI, IE e NEITHER.  
+Porem na Universidade de Irvine, usaram a metodologia de "validação cruzada de dez vezes" em 1000 exemplos selecionados aleatoriamente do conjunto completo de 3190. E nossa abordagem, utilizamos as amostras em validações cruzadas (folds) que variaram de 5, 10 e 20, porém em toda a base de dados e seu conjunto de 3190 registros.
+
+-----
+**Sobre a Árvore de Decisão Random Forest**
+
+Este algoritmo é uma **Árvore de Decisão Aleatória** e consiste de múltiplas árvores de decisão (**Forest**). Cada árvore é treinada em um subconjunto diferente dos dados e suas previsões são combinadas (geralmente pela média ou votação majoritária) para produzir o resultado final.
+
+Os seguintes hiperparâmetros foram alterados de forma sistêmica, mantendo-se valores pré-definidos, e então procedendo alterações dos valores para maior ou menor, sempre acompanhando a acurácia e os erros percentuais por classe analisada:
+
+| Hiperparâmetro | Valor Final | Descrição |
+|:--------------:|:-----------:|:---------:|
+| n_estimators   | 400         |  Especifica o número de árvores na floresta. Um número maior de árvores geralmente melhora o desempenho, pois reduz o sobreajuste e varia da estimativa final. Porém, um número maior aumenta o tempo de treinamento e requisitos de memória |
+| n_splits       | 20   | Indica que, o conjunto de dados é dividido em 20 partes iguais. Cada **(fold)** será usada como conjunto de validação uma vez,o restante dos dados é usado para treinamento.|
+
+![image](https://github.com/user-attachments/assets/b6ff13fc-0970-4ddc-8cca-95dec6222886)
 
 
+Nos resultados acimpa percebemos que o aumento no número de árovores aleatórias (**n_estimators**) não melhorou o resultado, pois a variação nos erros percentuais nas séries investigadas foi muito pequena. Se compararmos **400 n_estimators e 20 n_splits**, com **800 n_estimators e 20 n_splits**, veremos que ao dobrar o número de árvores, não tivemos variação significativa no sentido da diminuição das taxas de erros nas sequências em análise. Mantendo-se os números de n_splits constantes, vemos que ao reduzir o número de árvores, os valores de erros foram reduzindo. (**melhorando**)
 
+Porém, observando-se a planilha como um todo, temos um aumento no número de árvores (**100 a 400**) e mantendo-se os **n_splits constantes (20)**, os valores foram caindo. A partir desse ponto, com 400 árvores e 20 conjunto de dados para treinamento e validação cruzada, os valores dos erros % por série, foram aumentados. Em contrapartida, os resultados foram piorando, ficando evidente que encontramos um valor médio nos parâmetros de ajuste (hiperparâmetros), onde obtivemos os melhores índices de erros e acurária média do modelo.
 
+Concluindo, podemos observar que os melhores resultados nos **erros % das série EI, IE e NEITHER** com o **Random Forest**, foram respectivamente **7,09%, 9,58% e 4,36%**. Estes resultados **são melhores**, em parte, que os apresentados no site que hospeda a base de dados, os quais foram **7.56%, 8.47%, 4.62%**, respectivamente para as suas séries EI, IE e NEITHER.  
+Novamente lembramos que na Universidade de Irvine, usaram a metodologia de "validação cruzada de dez vezes" em 1000 exemplos selecionados aleatoriamente do conjunto completo de 3190. E nossa abordagem, utilizamos as amostras em validações cruzadas (folds) que variaram de **10 a 30**, porém em toda a base de dados e seu conjunto de 3190 registros.
 
+Mesmo tendo **reduzido** a taxa de erros nas séries **EI para 7,09% e NEITHER para 4,36%, na série IE com 9,58%** a taxa de erros não foi reduzida com uso do **Random Forest**. Porém, além do fato da redução de hiperparâmetros para serem configurados e analisados, e também do tempo de execução em máquina, este algoritmo se mostra superior ao KBANN, em resumo, mais rápido, mais fácil de configuração e com melhores resultados, ao menos neste modelo de dados em análise.
 
+----
 
+**Sobre a Rede Neural MLP - Multi Layer Perceptron**
+
+Este algoritmo é um tipo de rede neural feedforward composta por pelo menos três camadas de nós: uma camada de entrada, uma ou mais camadas ocultas e uma camada de saída. Cada nó (neurônio) em uma camada usa uma função de ativação não linear, exceto pelos nós de entrada. MLPs são capazes de aprender representações não lineares complexas, tornando-os adequados para tarefas de classificação e regressão.
+
+Os seguintes hiperparâmetros foram alterados de forma sistêmica, mantendo-se valores pré-definidos, e então procedendo alterações dos valores para maior ou menor, sempre acompanhando a acurácia e os erros percentuais por classe analisada:
+
+| Hiperparâmetro | Valor Final | Descrição |
+|:--------------:|:-----------:|:---------:|
+|hidden_layer_sizes| 128 x 64  | Define o tamanho da camada da rede neural,oculta para 128 e 64 perceptrons |
+| max_iter   | 200   | Número de iterações completas através do conjunto de dados de treinamento. Cada época permite que o modelo aprenda mais sobre os dados. |
+| n_splits           | 20   | Indica que, o conjunto de dados é dividido em 20 partes iguais. Cada **(split)** será usada como conjunto de validação uma vez,o restante dos dados é usado para treinamento.|
+
+![image](https://github.com/user-attachments/assets/758ce7e1-3384-484c-b29b-ee682951011b)
+
+Os resultados obtidos com esse algoritmo MLP foram os piores, em relação aos demais modelos. Notadamente a parametrização (hiperparâmetros) para este algoritmo é bem limitada, restringindo aos valores das camadas ocultas (hidden_layer_sizes), o número de iterações (max_iter) e as o número de conjuntos de dados para validação cruzada (n_splits). Não temos mais parâmetros como as funções de ativação, parâmetros Batch, funções perda (loss), Dropout, dentre outros parâmetros.
+
+Assim percebemos que, de fato é um algoritmo um pouco limitado, mas não houve tempo para procurar mais detalhes e talvez fazer ou utilizar versões mais aprimoradas do mesmo, entretanto para efeitos de comparação com os demais, podemos creditar a limitação de hiperparâmetros como um fator de diminui as possibilidades de acurácia deste algoritmo, em contraponto, por exemplo, com as redes KBANN.
+
+Os melhores resultados obtidos nesta rede neural foram: m **10,96%, 12,22%, 6,50%**, respectivamente para as suas séries EI, IE e NEITHER, tendo-se uma acurácia média de 0,95, ou seja, a menor de todos os algoritmos aqui testados.
+
+A planilha acima apresenta mais resultados deste algoritmo e facilita a visualização das opções de modificação nos hiperparâmetros, e os resultados alcançados, onde podemos ver que as evoluções foram muito pequenas, pelas variações de parâmetros.
+
+----
+### Conclusão
+
+Enfim, de todos os algoritmos testados, pelos resultados e simplicidade de parametrização, além do tempo de execução, o Random Forest apresentou resultados levementes superiores à rede neural KBANN. Entretanto esta última é de complexidade mais elevada de parametrização e exige mais tempo para testes e treinamento dos parâmetros. Devido ao tempo de execução, pode se tornar uma tarefa bem exaustiva e de difícil implementação, uma vez que a mudança de vários parâmetros pode produzir resultados inesperados, se não for realizada de maneira sistêmica e com acompanhamento e verificação dos resultados.
+
+É possível perceber que, a parametrização de algoritmos torna-se uma especialidade necessária, na medida que o emprego/utilização dessas ferramentas, de forma mais corriqueira nas empresas, vai impondo a necessidade desse conhecimento, e como consequência temos a necessidade de atualização quase constante no conhecimento dos algoritmos, seus hiperparâmetros e características fundamentais. Pois não devemos esquecer que, o tipo de problema para o qual devemos aplicar os algoritmos, são de extrema importância para que os mesmos consigam apresentar resultados satisfatórios e condizentes com seus objetivos primordiais.
+
+Em síntese, tais algorimtos devem ser empregados corretamente nas tarefas correspondentes, como Classificação, Agrupamento ou Regressão, ou seja, sempre há um algoritmo mais adequado para cada problema a ser resolvido ou respondido.
+
+Esta atividade cada dia que passa, pode se tornar uma arte!
+
+----
 ## Sobre o Trabalho
 
 O presente trabalho foi desenvolvido como exercício final para a disciplina de **CA006NC - Inteligência Artificial**, do curso de Mestrado em Inteligência Artificial, dentro do PPGI - Programa de Pós-Graduação em Informática, da UTFPR Cornélio Procópio/PR
