@@ -85,7 +85,6 @@ Os objetivos principais neste trabalho é apresentar perspectivas de aplicação
   
   - [Rede Neural KBANN (Knowledge-Based Artificial Neural Networks)](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.inf.ufrgs.br/~engel/data/media/file/cmp121/kbann-artigo.pdf&ved=2ahUKEwiFn9yCqdWKAxX4BrkGHWFMEq8QFnoECBUQAQ&usg=AOvVaw2yzjp752bnqkN2fu16XcdW)
   - [RandomForestClassifier](https://link.springer.com/article/10.1023/a:1010933404324)
-  - [SVM Classifier](https://link.springer.com/article/10.1007/BF00994018)
   - [MLP Classifier - Multi Layer Perceptron](https://www.semanticscholar.org/paper/Learning-representations-by-back-propagating-errors-Rumelhart-Hinton/052b1d8ce63b07fec3de9dbb583772d860b7c769)
 
 Importante lembrar que as teorias aqui apresentadas, especificamente sobre o sequenciamento de DNA e suas interpretações nas questões do Domínio Sequencial, não estão num formalismo acadêmico, mas foram adicionadas para contextualizar o problema que foi objeto para a aplicação dos algoritmos, e ajustes dos seus respectivos hiperparâmetros. Entretanto colocamos os links para os temas abordadas, caso haja interesse para melhor entendimento e esclarecimentos.
@@ -118,13 +117,13 @@ Os seguintes hiperparâmetros foram diversas vezes alterados de forma sistêmica
 
 ![image](https://github.com/user-attachments/assets/3597cfe3-c2cc-4c7b-a75e-a7d556c0801b)
 
-Nos resultados obtidos, podemos perceber que não andiantou criar uma estrutura de redes neurais muito grande, pois a variação nos erros percentuais nas séries investigadas foi muito pequena. Se compararmos uma rede com 256 x 128 x 64 x 32, tendo 4 camadas ocultas, gerou uma taxa de erros de 10.33% na série EI, contra o melhor resultado de 8,11% na mesma série, agora obtido com uma rede de 64 x 32 neurônios nas camadas internas.
+Nos resultados obtidos, podemos perceber que não adiantou criar uma estrutura de redes neurais muito grande, pois a variação nos erros percentuais nas séries investigadas foi muito pequena. Se compararmos uma rede com 256 x 128 x 64 x 32, tendo 4 camadas ocultas, gerou uma taxa de erros de 10.33% na série EI, contra o melhor resultado de 8,11% na mesma série, agora obtido com uma rede de 64 x 32 neurônios nas camadas internas.
 
 A mudança desses valores foi seguida por ajustes nos tamanhos das partições das validações cruzadas (folds), que foram de **10 fold** no primeiro caso, subindo até **20 fold** no melhor caso. Também impactante verificar que o número dos parâmetros Epoch e Batch foram reduzidos drasticamente, de **300 epoch** e **192 batch**, para **50 epoch** e **8 batch**.
 
 O número de iterações completas através do conjunto de dados de treinamento, ou o parâmetro **Epoch**, permite que o modelo aprenda mais sobre os dados. Porém o grande valor inicial estava superestimado, pois verificou-se que sua redução foi mais impactante na redução dos erros percentuais por séries, da mesma forma que ocorreu com o número das redes neurais ocultas
 
-Juntamente com o parâmetro **Epch**, o parâmetro **Batch** também veio sendo reduzido em conjunto, tendo seu resultado final em **8 Batch**. Esse parâmetro é o número de amostras usadas antes de atualizar os pesos no modelo. Um tamanho de lote menor evita sobrecarga da memória, mas pode tornar o treinamento mais ruidoso. Entretanto, nos resultados obtidos, foi justamente a redução neste parâmetro que também contribuiu para redução nos erros percentuais nas séries. 
+Juntamente com o parâmetro **Epoch**, o parâmetro **Batch** também veio sendo reduzido em conjunto, tendo seu resultado final em **8 Batch**. Esse parâmetro é o número de amostras usadas antes de atualizar os pesos no modelo. Um tamanho de lote menor evita sobrecarga da memória, mas pode tornar o treinamento mais ruidoso. Entretanto, nos resultados obtidos, foi justamente a redução neste parâmetro que também contribuiu para redução nos erros percentuais nas séries. 
 
 Os parâmetros que ficaram fixos, na verdade foram objeto de testes, onde também alteramos seus valores, como o **Dropout de 0.5 para 0.3 e 0.7**, mas não houveram mudanças significativas nos resultados.
 Deste modo observamos que os hiperparâmetros ajustados foram os mais relevantes para a mudança nos resultados, reduzindo os erros %, mas manteve-se em todos os casos, a acurácia em 0.96.
@@ -147,14 +146,17 @@ Os seguintes hiperparâmetros foram alterados de forma sistêmica, mantendo-se v
 ![image](https://github.com/user-attachments/assets/b6ff13fc-0970-4ddc-8cca-95dec6222886)
 
 
-Nos resultados acimpa percebemos que o aumento no número de árovores aleatórias (**n_estimators**) não melhorou o resultado, pois a variação nos erros percentuais nas séries investigadas foi muito pequena. Se compararmos **400 n_estimators e 20 n_splits**, com **800 n_estimators e 20 n_splits**, veremos que ao dobrar o número de árvores, não tivemos variação significativa no sentido da diminuição das taxas de erros nas sequências em análise. Mantendo-se os números de n_splits constantes, vemos que ao reduzir o número de árvores, os valores de erros foram reduzindo. (**melhorando**)
+Nos resultados acimpa percebemos que o aumento no número de árvores aleatórias (**n_estimators**) não melhorou o resultado, pois a variação nos erros percentuais nas séries investigadas foi muito pequena. Se compararmos **400 n_estimators e 20 n_splits**, com **800 n_estimators e 20 n_splits**, veremos que ao dobrar o número de árvores, não tivemos variação significativa no sentido da diminuição das taxas de erros nas sequências em análise. Mantendo-se os números de n_splits constantes, vemos que ao reduzir o número de árvores, os valores de erros foram reduzindo. (**melhorando**)
 
-Porém, observando-se a planilha como um todo, temos um aumento no número de árvores (**100 a 400**) e mantendo-se os **n_splits constantes (20)**, os valores foram caindo. A partir desse ponto, com 400 árvores e 20 conjunto de dados para treinamento e validação cruzada, os valores dos erros % por série, foram aumentados. Em contrapartida, os resultados foram piorando, ficando evidente que encontramos um valor médio nos parâmetros de ajuste (hiperparâmetros), onde obtivemos os melhores índices de erros e acurária média do modelo.
+Porém, observando-se a planilha como um todo, temos um aumento no número de árvores (**100 a 400**) e mantendo-se os **n_splits constantes (20)**, os valores foram caindo. A partir desse ponto, com 400 árvores e 20 conjunto de dados para treinamento e validação cruzada, os valores dos erros % por série, foram aumentados. Em contrapartida, os resultados foram piorando, ficando evidente que encontramos um valor médio nos parâmetros de ajuste (hiperparâmetros), onde obtivemos os melhores índices de erros e acurácia média do modelo.
 
-Concluindo, podemos observar que os melhores resultados nos **erros % das série EI, IE e NEITHER** com o **Random Forest**, foram respectivamente **7,09%, 9,58% e 4,36%**. Estes resultados **são melhores**, em parte, que os apresentados no site que hospeda a base de dados, os quais foram **7.56%, 8.47%, 4.62%**, respectivamente para as suas séries EI, IE e NEITHER.  
+Concluindo, podemos observar que os melhores resultados nos **erros % das série EI, IE e NEITHER** com o **Random Forest**, foram respectivamente **7,09%, 9,58% e 4,36%**. Estes resultados **são melhores**, em parte, que os apresentados no site que hospeda a base de dados, os quais foram **7.56%, 8.47%, 4.62%**, respectivamente para as suas séries EI, IE e NEITHER.
+
 Novamente lembramos que na Universidade de Irvine, usaram a metodologia de "validação cruzada de dez vezes" em 1000 exemplos selecionados aleatoriamente do conjunto completo de 3190. E nossa abordagem, utilizamos as amostras em validações cruzadas (folds) que variaram de **10 a 30**, porém em toda a base de dados e seu conjunto de 3190 registros.
 
-Mesmo tendo **reduzido** a taxa de erros nas séries **EI para 7,09% e NEITHER para 4,36%, na série IE com 9,58%** a taxa de erros não foi reduzida com uso do **Random Forest**. Porém, além do fato da redução de hiperparâmetros para serem configurados e analisados, e também do tempo de execução em máquina, este algoritmo se mostra superior ao KBANN, em resumo, mais rápido, mais fácil de configuração e com melhores resultados, ao menos neste modelo de dados em análise.
+Mesmo tendo **reduzido** a taxa de erros nas séries **EI para 7,09% e NEITHER para 4,36%, na série IE com 9,58%** a **acurácia** não foi reduzida com uso do **Random Forest**. Porém, além do fato da redução de hiperparâmetros para serem configurados e analisados, e também do tempo de execução em máquina, este algoritmo se mostra superior ao KBANN.
+
+Em resumo, mais rápido, mais fácil de configuração e com melhores resultados, ao menos neste modelo de dados em análise.
 
 ----
 
@@ -172,18 +174,18 @@ Os seguintes hiperparâmetros foram alterados de forma sistêmica, mantendo-se v
 
 ![image](https://github.com/user-attachments/assets/758ce7e1-3384-484c-b29b-ee682951011b)
 
-Os resultados obtidos com esse algoritmo MLP foram os piores, em relação aos demais modelos. Notadamente a parametrização (hiperparâmetros) para este algoritmo é bem limitada, restringindo aos valores das camadas ocultas (hidden_layer_sizes), o número de iterações (max_iter) e as o número de conjuntos de dados para validação cruzada (n_splits). Não temos mais parâmetros como as funções de ativação, parâmetros Batch, funções perda (loss), Dropout, dentre outros parâmetros.
+Os resultados obtidos com esse algoritmo MLP foram os piores, em relação aos demais modelos. Notadamente a parametrização (hiperparâmetros) para este algoritmo é bem limitada, restringindo aos valores das camadas ocultas (**hidden_layer_sizes**), o número de iterações (**max_iter**) e as o número de conjuntos de dados para validação cruzada (**n_splits**). Não temos mais parâmetros como as funções de ativação, parâmetros Batch, funções perda (loss), Dropout, dentre outros parâmetros.
 
 Assim percebemos que, de fato é um algoritmo um pouco limitado, mas não houve tempo para procurar mais detalhes e talvez fazer ou utilizar versões mais aprimoradas do mesmo, entretanto para efeitos de comparação com os demais, podemos creditar a limitação de hiperparâmetros como um fator de diminui as possibilidades de acurácia deste algoritmo, em contraponto, por exemplo, com as redes KBANN.
 
-Os melhores resultados obtidos nesta rede neural foram: m **10,96%, 12,22%, 6,50%**, respectivamente para as suas séries EI, IE e NEITHER, tendo-se uma acurácia média de 0,95, ou seja, a menor de todos os algoritmos aqui testados.
+Os melhores resultados obtidos nesta rede neural foram: **10,96%, 12,22%, 6,50%**, respectivamente para as suas séries **EI, IE e NEITHER**, tendo-se uma acurácia média de **0,95**, ou seja, a menor em todos os algoritmos aqui testados.
 
-A planilha acima apresenta mais resultados deste algoritmo e facilita a visualização das opções de modificação nos hiperparâmetros, e os resultados alcançados, onde podemos ver que as evoluções foram muito pequenas, pelas variações de parâmetros.
+A planilha acima apresenta mais resultados deste algoritmo e facilita a visualização das opções de modificação nos hiperparâmetros e fos resultados alcançados, onde podemos ver que as evoluções foram muito pequenas, pelas variações de parâmetros.
 
 ----
 ### Conclusão
 
-Enfim, de todos os algoritmos testados, pelos resultados e simplicidade de parametrização, além do tempo de execução, o Random Forest apresentou resultados levementes superiores à rede neural KBANN. Entretanto esta última é de complexidade mais elevada de parametrização e exige mais tempo para testes e treinamento dos parâmetros. Devido ao tempo de execução, pode se tornar uma tarefa bem exaustiva e de difícil implementação, uma vez que a mudança de vários parâmetros pode produzir resultados inesperados, se não for realizada de maneira sistêmica e com acompanhamento e verificação dos resultados.
+Enfim, de todos os algoritmos testados, pelos resultados e simplicidade de parametrização, além do tempo de execução, o **Random Forest** apresentou resultados levementes superiores à rede neural **KBANN**. Entretanto, esta última é de complexidade mais elevada de parametrização e exige mais tempo para testes e treinamento dos parâmetros. Devido ao tempo de execução, pode se tornar uma tarefa bem exaustiva e difícil implementação, uma vez que a mudança de vários parâmetros pode produzir resultados inesperados, se não for realizada de maneira sistêmica e com acompanhamento e verificação dos resultados.
 
 É possível perceber que, a parametrização de algoritmos torna-se uma especialidade necessária, na medida que o emprego/utilização dessas ferramentas, de forma mais corriqueira nas empresas, vai impondo a necessidade desse conhecimento, e como consequência temos a necessidade de atualização quase constante no conhecimento dos algoritmos, seus hiperparâmetros e características fundamentais. Pois não devemos esquecer que, o tipo de problema para o qual devemos aplicar os algoritmos, são de extrema importância para que os mesmos consigam apresentar resultados satisfatórios e condizentes com seus objetivos primordiais.
 
