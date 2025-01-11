@@ -73,7 +73,6 @@ def encode_sequences(X):
 
 # Função para encode das sequências de DNA em formato numérico, para o SVM
 def one_hot_encode_dna(sequences):
-
     # Se as sequências estiverem em um formato numpy, converta para lista
     if isinstance(sequences, np.ndarray):
         sequences = sequences.tolist()
@@ -177,11 +176,11 @@ def random_forest():
     # Impressão da matriz de confusão total
     print("\nMatriz de Confusão Total:\n", total_conf_matrix)
 
+
 # SVM foi testado não não colocado no projeto. Precisamos de mais conhecimento para avançarmos neste algoritmo
 # Treinamento em SVM com K-Folds e otimização de hiperparâmetros
 def svm_exec(X, y):
-
-    kfolds=20
+    kfolds = 20
     # Codificando as sequências de DNA
     X_encoded = one_hot_encode_dna(X)
 
@@ -352,7 +351,6 @@ def kbann_exe():
 
 # Rede Neural Multicamada
 def mlp_exec():
-
     kf = KFold(n_splits=10, shuffle=True, random_state=42)
 
     # Determinando o número de classes
@@ -421,14 +419,14 @@ def mlp_exec():
 
     # Impressão da matriz de confusão total
     print("\nMatriz de Confusão Total:\n", total_confusion_matrix)
+
+
 # Exemplo de uso:
-
-
 
 # kbann_exe()  #  Caso deseje executar a rede neural KBANN
 
 # random_forest()  #  Caso deseje executar o classificador RandoForest
 
-#svm_exec(X, y)  # Caso deseje executar a rede SVM Suport Vector Machine
+# svm_exec(X, y)  # Caso deseje executar a rede SVM Suport Vector Machine
 
 mlp_exec()  # Caso deseje executar a rede MLP - Multilayer Perceptron
