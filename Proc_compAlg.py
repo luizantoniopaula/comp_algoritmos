@@ -65,7 +65,7 @@ def encode_sequences(X):
     sequences = np.array(X)
     flat_sequences = sequences.reshape(-1)
 
-    # One-hot encode the characters
+    # One-hot codificação de caracteres
     encoder = OneHotEncoder(categories='auto')
     one_hot_encoded = encoder.fit_transform(flat_sequences[:, None]).toarray()
     return one_hot_encoded.reshape(sequences.shape[0], -1)
@@ -73,7 +73,6 @@ def encode_sequences(X):
 
 # Função para encode das sequências de DNA em formato numérico, para o SVM
 def one_hot_encode_dna(sequences):
-    """Codifica sequências de DNA em formato one-hot, reconhecendo automaticamente nucleotídeos únicos."""
 
     # Se as sequências estiverem em um formato numpy, converta para lista
     if isinstance(sequences, np.ndarray):
@@ -101,8 +100,7 @@ X_encoded = encode_sequences(X)
 
 # Codificação das classes
 label_encoder = LabelEncoder()
-y_encoded = label_encoder.fit_transform(
-    y)  # .to_numpy().ravel()) # Problemas na função ravel() do numpy vindo de dataframe Pandas
+y_encoded = label_encoder.fit_transform(y)  # Problemas na função ravel() do numpy vindo de dataframe Pandas
 
 # Divisão em treino e teste (20% para teste e 80% para treinamento)
 X_train, X_test, y_train, y_test = train_test_split(X_encoded, y_encoded, test_size=0.2, random_state=42)
@@ -179,7 +177,7 @@ def random_forest():
     # Impressão da matriz de confusão total
     print("\nMatriz de Confusão Total:\n", total_conf_matrix)
 
-
+# SVM foi testado não não colocado no projeto. Precisamos de mais conhecimento para avançarmos neste algoritmo
 # Treinamento em SVM com K-Folds e otimização de hiperparâmetros
 def svm_exec(X, y):
 
