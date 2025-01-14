@@ -368,6 +368,10 @@ def kbann_exe():
     # Impressão da matriz de confusão total
     print("\nMatriz de Confusão Total:\n", total_conf_matrix)
 
+    # Gráficos
+    plot_confusion_matrix(total_conf_matrix, labels, 'KBANN')
+    plot_accuracies_and_errors(np.mean(accuracies), np.std(accuracies), error_rates, labels, 'KBANN')
+
 
 # Rede Neural Multicamada
 def mlp_exec():
@@ -379,7 +383,8 @@ def mlp_exec():
 
     accuracy_scores = []
     total_confusion_matrix = np.zeros((num_classes, num_classes))  # Matriz de confusão acumulada
-    error_rates = [[] for _ in range(num_classes)]  # Listas para armazenar taxas de erro por classe
+    #error_rates = [[] for _ in range(num_classes)]  # Listas para armazenar taxas de erro por classe
+    #error_rates = []
     # Taxas de erros por rótulos IE, EI e NEITHER
     labels = {0: 'EI', 1: 'IE', 2: 'NEITHER'}  # Assumindo que 0, 1, e 2 são os rótulos das classes
 
@@ -418,7 +423,7 @@ def mlp_exec():
                 error_rates[label_index].append(error_rate)  # Armazena a taxa de erro
             else:
                 error_rates[label_index].append(None)  # Para evitar divisão por zero se total for 0
-
+        print("Taxa de erros: ", error_rates)
         # Relatório de classificação
         print("\nResultados da rede MLP:")
         print("\nMatriz de Confusão:\n", confusion_matrix(y_test, mlp_y_pred))
@@ -429,6 +434,7 @@ def mlp_exec():
     print(f"Desvio padrão da acurácia: {np.std(accuracy_scores):.2f}")
 
     # Cálculos e impressão das taxas de erro finais por rótulo
+
     for label_index, label in labels.items():
         if len(error_rates[label_index]) > 0:
             avg_error_rate = np.mean(error_rates[label_index])
@@ -439,14 +445,18 @@ def mlp_exec():
 
     # Impressão da matriz de confusão total
     print("\nMatriz de Confusão Total:\n", total_confusion_matrix)
+    # Gráficos
+    plot_confusion_matrix(total_confusion_matrix, labels, 'MLP')
+    plot_accuracies_and_errors(np.mean(accuracy_scores), np.std(accuracy_scores), error_rates, labels,'MLP')
 
+# Exemplos de uso:
 
-# Exemplo de uso:
+#kbann_exe()  #  Caso deseje executar a rede neural KBANN
 
-# kbann_exe()  #  Caso deseje executar a rede neural KBANN
-
-random_forest()  #  Caso deseje executar o classificador RandoForest
+#random_forest()  #  Caso deseje executar o classificador RandoForest
 
 # svm_exec(X, y)  # Caso deseje executar a rede SVM Suport Vector Machine
 
-#mlp_exec()  # Caso deseje executar a rede MLP - Multilayer Perceptron
+mlp_exec()  # Caso deseje executar a rede MLP - Multilayer Perceptron
+
+

@@ -21,7 +21,6 @@ def plot_accuracies_and_errors(accuracy_mean, accuracy_std, avg_error_rates, lab
     plt.figure(figsize=(10, 6))
 
     # Gráfico de Acurácias
-    # Gráfico de Acurácias
     plt.bar(x - 0.2, [accuracy_mean * 100] * len(categories), width=0.4, label='Acurácia Média (%)', color='blue',
             alpha=0.6)
 
