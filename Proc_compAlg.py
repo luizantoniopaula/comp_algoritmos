@@ -25,6 +25,7 @@ from tensorflow.keras.layers import Dense, Dropout, Input
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
+from graficosComp import *
 
 #  Define o path dos arquivos Python
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -176,6 +177,25 @@ def random_forest():
     # Impressão da matriz de confusão total
     print("\nMatriz de Confusão Total:\n", total_conf_matrix)
 
+    # Cálculos e impressão das taxas de erro finais por rótulo
+    avg_error_rates = []
+    for label_index, label in labels.items():
+        if len(error_rates[label_index]) > 0:
+            avg_error_rate = np.mean(error_rates[label_index])
+            avg_error_rates.append(avg_error_rate)
+            std_error_rate = np.std(error_rates[label_index])
+            print(f'Taxa de erro média para {label}: {avg_error_rate:.2%} (Desvio Padrão: {std_error_rate:.2%})')
+        else:
+            avg_error_rates.append(None)
+            print(f'Taxa de erro para {label}: Não disponível')
+
+    # Impressão da matriz de confusão total
+    print("\nMatriz de Confusão Total:\n", total_conf_matrix)
+
+    # Gráficos
+    plot_confusion_matrix(total_conf_matrix, labels, 'Random Forest')
+    plot_accuracies_and_errors(np.mean(accuracy_scores), np.std(accuracy_scores), avg_error_rates, labels, 'Random Forest')
+
 
 # SVM foi testado não não colocado no projeto. Precisamos de mais conhecimento para avançarmos neste algoritmo
 # Treinamento em SVM com K-Folds e otimização de hiperparâmetros
@@ -203,7 +223,7 @@ def svm_exec(X, y):
     try:
         grid_search.fit(X_encoded, y)
     except Exception as e:
-        print("An error occurred during GridSearchCV fitting:", e)
+        print("Erro durante o ajuste (fitting) do GridSearchCV:", e)
         return
 
     # Modelo SVM otimizado
@@ -228,14 +248,14 @@ def svm_exec(X, y):
         accuracy_scores.append(accuracy)
 
         # Seleção de métricas adicionais para verificação
-        print("Confusion Matrix:")
+        print("Matriz de confusão:")
         print(confusion_matrix(y_test, svm_y_pred))
         print(classification_report(y_test, svm_y_pred))
-        print("Accuracy for this fold:", accuracy)
+        print("Acurácia para o fold:", accuracy)
 
     # Acurácia média
-    print("Average Accuracy across all folds:", np.mean(accuracy_scores))
-    print("Best Hyperparameters:", grid_search.best_params_)
+    print("Média da Acurácia de todos os Folds:", np.mean(accuracy_scores))
+    print("Melhores Hyperparâmetros:", grid_search.best_params_)
 
 
 #
@@ -425,8 +445,8 @@ def mlp_exec():
 
 # kbann_exe()  #  Caso deseje executar a rede neural KBANN
 
-# random_forest()  #  Caso deseje executar o classificador RandoForest
+random_forest()  #  Caso deseje executar o classificador RandoForest
 
 # svm_exec(X, y)  # Caso deseje executar a rede SVM Suport Vector Machine
 
-mlp_exec()  # Caso deseje executar a rede MLP - Multilayer Perceptron
+#mlp_exec()  # Caso deseje executar a rede MLP - Multilayer Perceptron
