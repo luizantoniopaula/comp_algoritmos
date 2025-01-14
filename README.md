@@ -194,8 +194,29 @@ Em síntese, tais algorimtos devem ser empregados corretamente nas tarefas corre
 Esta atividade cada dia que passa, pode se tornar uma arte!
 
 ----
+### Execução do programa Proc_compAlg.py
+
+Para executar o código comparativo, basta baixar o arquivo do programa em linguagem Python, disponível neste repositório, com o nome **Proc_compAlg.py**.
+Uma vez baixado, abrir o arquivo com alguma IDE para Python, como o **Pycharm**, o **VSCode** ou qualquer outra de sua escolha. Verificar que existem vários imports de bibliotecas, no início do arquivo do programa.
+
+Convém lembrar que, cada linha de import deve ser instalada via comando **"pip install nome_bibblioteca"**. Se por ventura seu ambiente já tiver a biblioteca, o instalador somente relata que há versão instalada, caso não tenha ele a bilbioteca será instalada em seu ambiente.
+
+Uma vez instaladas a bilbiotecas, vá para o final o arquivo ondem existem as chamadas das funções que executam, individualmente, cada algoritmo descrito neste trabalho. As linhas das chamadas das funções são as seguintes:
+
+**Exemplos de uso**:
+- #**kbann_exe()**  #  Caso deseje executar a rede neural KBANN
+- #**random_forest()**  #  Caso deseje executar o classificador RandoForest
+- #svm_exec(X, y)  # Caso deseje executar a rede SVM Suport Vector Machine --> Não executar, pois não está funcionando ainda...
+- #**mlp_exec()**  # Caso deseje executar a rede MLP - Multilayer Perceptron
+
+Basta então escolher o algoritmos e **remover o caracter "#"** que comenta a linha, assim basta rodar o programa. Em suas execuções, irão  ser impressos os resultados de cada passagem nos Folds de testes, com os resultados individuais por Fold. Ao final será printado no terminal os resultados e os gráficos da matriz de confusão e dos percentuais de acurácia e erros% por série, este último na forma de um gráfico de barras.
+
+Peço a gentileza se caso não executar, reportar ao meu email para que eu possa corrigir e melhorar detalhes, se for possível.
+
+---
 ## Sobre o Trabalho
 
 O presente trabalho foi desenvolvido como exercício final para a disciplina de **CA006NC - Inteligência Artificial**, do curso de Mestrado em Inteligência Artificial, dentro do PPGI - Programa de Pós-Graduação em Informática, da UTFPR Cornélio Procópio/PR
 
 Elaboração: **Luiz Antonio Silva de Paula**
+[email](mailto:luiz.paula@alunos.utfpr.edu.br)
